@@ -1,2 +1,5 @@
+import config from './config.json'
+import Bot from './discord/Bot'
 
-console.log("Hello, TypeScript")
+// initialize our discord bot and connect it
+new Bot(config.discord).connect()
