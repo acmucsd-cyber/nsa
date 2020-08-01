@@ -61,4 +61,17 @@ npm run build
 npm run start
 ```
 
+**finally**, to actually run and test the bot, you'll NEED a bot token.
+
+to configure this project to use your bot token, create a bot token at
+[Discord's Developer Portal](https://discordapp.com/developers/applications/).
+
+then, create a `config.json` in the `./src' folder,
+according to the specification of the [Config Interface](https://github.com/acmucsd-cyber/nsa/blob/master/src/types/Config.d.ts):
+```bash
+touch ./src/config.json
+```
+and set the `token` value to your Discord bot token.
+*this project will not compile until the config.json file is crafted up to the above specification.*
+
 more runners / watcher scripts for development coming soon...
