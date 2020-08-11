@@ -50,8 +50,9 @@ export default class Bot {
 		this.client.on('guildMemberAdd', member =>
 		{
 			console.log("new member")
-			member.send("Welcome to the ACM Cyber server! Get your roles in #roles. Once you introduce yourself in #introductions, you'll have access to the full ACM Cyber Server!")
+			member.send("Welcome to ACM Cyber's Discord! ACM Cyber is an ACM sub-org and community of all kinds of cybersecurity enthusiasts and hobbyists. This Discord server is our virtual home and a hub for our members -- it's where we will announce club activities and events, hold spontaneous discussions, post memes, and more! We welcome everyone from all skill levels and backgrounds. Read the rules in #rulesandinfo and once you introduce yourself in #introductions, you'll have access to the full server! Get your roles over in #roles, and join the discussion in #lobby!")
 				.catch(console.error);
+
 		})
 		//Giving users server access once they type in the introductions channel. Need to give the bot "manage roles" perms.
 		this.client.on("message", msg =>
@@ -60,7 +61,7 @@ export default class Bot {
 			{
 				if (msg.content.includes(' '))
 				{
-					if(!(msg.member.roles.cache.has('742797850630684762'))) //ID of "verified" role
+					if(!(msg.member.roles.cache.has('742797850630684762'))) //ID of "member" role
 					{
 						console.log("addrole")
 						msg.member.roles.add('742797850630684762')
