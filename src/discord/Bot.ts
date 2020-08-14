@@ -69,42 +69,16 @@ export default class Bot {
 			}
 			else if (commandString[0] === "toolkit" || commandString[0] === "tk")
 			{
+					let cat = commandString[1]
 					let tools: string = ""
-					if (commandString[1] === "rev")
+					let categories: string[] = ["rev", "pwn", "crypto", "steg", "forens", "web", "osint", "net"]
+					if (categories.includes(cat))
 					{
-						Object.keys(toolkit.rev).forEach(function(key) {
-  						tools += '\nTool : ' + toolkit.rev[key].name + '\nDescription : ' + toolkit.rev[key].description
-								+ '\nurl: ' + toolkit.rev[key].url + '\n'
-							})
+						Object.keys(toolkit[cat]).forEach(function(key) {
+							tools += '\nTool : ' + toolkit[cat][key].name + '\nDescription : ' + toolkit[cat][key].description
+								+ '\nurl: ' + toolkit[cat][key].url + '\n'
+						})
 						msg.reply(tools)
-					}
-					else if (commandString[1] === "pwn")
-					{
-						msg.reply("ok")
-					}
-					else if (commandString[1] === "crypto")
-					{
-						msg.reply("ok")
-					}
-					else if (commandString[1] === "steg")
-					{
-						msg.reply("ok")
-					}
-					else if (commandString[1] === "forens")
-					{
-						msg.reply("ok")
-					}
-					else if (commandString[1] === "web")
-					{
-						msg.reply("ok")
-					}
-					else if (commandString[1] === "osint")
-					{
-						msg.reply("ok")
-					}
-					else if (commandString[1] === "net")
-					{
-						msg.reply("ok")
 					}
 					else
 					{

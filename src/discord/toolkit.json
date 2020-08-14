@@ -10,5 +10,89 @@
         "description": "test2",
         "url": "https://github.com/NationalSecurityAgency/ghidra"
     }
+  },
+  "pwn": {
+    "test": {
+        "name": "test",
+        "description": "test",
+        "url": "https://www.gnu.org/software/gdb/"
+    },
+    "ghidra": {
+        "name": "Ghidra",
+        "description": "test2",
+        "url": "https://github.com/NationalSecurityAgency/ghidra"
+    }
+  },
+  "crypto": {
+    "gdb": {
+        "name": "GDB",
+        "description": "test",
+        "url": "https://www.gnu.org/software/gdb/"
+    },
+    "ghidra": {
+        "name": "Ghidra",
+        "description": "test2",
+        "url": "https://github.com/NationalSecurityAgency/ghidra"
+    }
+  },
+  "steg": {
+    "gdb": {
+        "name": "GDB",
+        "description": "test",
+        "url": "https://www.gnu.org/software/gdb/"
+    },
+    "ghidra": {
+        "name": "Ghidra",
+        "description": "test2",
+        "url": "https://github.com/NationalSecurityAgency/ghidra"
+    }
+  },
+  "forens": {
+    "gdb": {
+        "name": "GDB",
+        "description": "test",
+        "url": "https://www.gnu.org/software/gdb/"
+    },
+    "ghidra": {
+        "name": "Ghidra",
+        "description": "test2",
+        "url": "https://github.com/NationalSecurityAgency/ghidra"
+    }
+  },
+  "web": {
+    "gdb": {
+        "name": "GDB",
+        "description": "test",
+        "url": "https://www.gnu.org/software/gdb/"
+    },
+    "ghidra": {
+        "name": "Ghidra",
+        "description": "test2",
+        "url": "https://github.com/NationalSecurityAgency/ghidra"
+    }
+  },
+  "osint": {
+    "gdb": {
+        "name": "GDB",
+        "description": "test",
+        "url": "https://www.gnu.org/software/gdb/"
+    },
+    "ghidra": {
+        "name": "Ghidra",
+        "description": "test2",
+        "url": "https://github.com/NationalSecurityAgency/ghidra"
+    }
+  },
+  "net": {
+    "gdb": {
+        "name": "GDB",
+        "description": "test",
+        "url": "https://www.gnu.org/software/gdb/"
+    },
+    "ghidra": {
+        "name": "Ghidra",
+        "description": "test2",
+        "url": "https://github.com/NationalSecurityAgency/ghidra"
+    }
   }
 }
