@@ -1,4 +1,5 @@
 import Discord, { Client, Message, User } from 'discord.js'
+import * as toolkit from './toolkit.json'
 
 export default class Bot {
 
@@ -11,7 +12,7 @@ export default class Bot {
 		this.client.on("message", msg =>
         	{
             		if (msg.content === "ping")
-            		{		
+            		{
                 		console.log("got a ping")
                 		msg.reply("Pong!")
             		}
@@ -59,8 +60,57 @@ export default class Bot {
 
 		if (prefix) {
 			const commandString: string[] = msg.content.substr(prefix.length).trim().split(' ')
-			
+
 			// process commands here
+			if (commandString[0] === "ping")
+			{
+					console.log("got a ping")
+					msg.reply("Pong!")
+			}
+			else if (commandString[0] === "toolkit" || commandString[0] === "tk")
+			{
+					let tools: string = ""
+					if (commandString[1] === "rev")
+					{
+						Object.keys(toolkit.rev).forEach(function(key) {
+  						tools += '\nTool : ' + toolkit.rev[key].name + '\nDescription : ' + toolkit.rev[key].description
+								+ '\nurl: ' + toolkit.rev[key].url + '\n'
+							})
+						msg.reply(tools)
+					}
+					else if (commandString[1] === "pwn")
+					{
+						msg.reply("ok")
+					}
+					else if (commandString[1] === "crypto")
+					{
+						msg.reply("ok")
+					}
+					else if (commandString[1] === "steg")
+					{
+						msg.reply("ok")
+					}
+					else if (commandString[1] === "forens")
+					{
+						msg.reply("ok")
+					}
+					else if (commandString[1] === "web")
+					{
+						msg.reply("ok")
+					}
+					else if (commandString[1] === "osint")
+					{
+						msg.reply("ok")
+					}
+					else if (commandString[1] === "net")
+					{
+						msg.reply("ok")
+					}
+					else
+					{
+						msg.reply("<help message>")
+					}
+			}
 		}
 	}
 
