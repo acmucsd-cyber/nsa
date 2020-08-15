@@ -62,13 +62,16 @@ export default class Bot {
 			const commandString: string[] = msg.content.substr(prefix.length).trim().split(' ')
 
 			// process commands here
-			if (commandString[0] === "ping") {
+			switch (commandString[0]) {
+				case "name":
+					msg.reply(`What about this?\n> ${generateName(commandString)}`)
+					break
+				case "ping":
 					console.log("got a ping")
 					msg.reply("Pong!")
-			}
-
-			// Toolkit commands
-			else if (commandString[0] === "toolkit" || commandString[0] === "tk") {
+					break
+				case "toolkit":
+				case "tk":
 					let cat = commandString[1]
 					let tools: string = ""
 					let categories: string[] = Object.keys(toolkit)
@@ -83,8 +86,10 @@ export default class Bot {
 							+ "categories\n\nCategories:\nrev\t\t  Reverse Engineering\nweb\t\tWeb\ncrypto\tCryptography\n"
 							+ "pwn\t\tPwnable\nsteg\t\tSteganography\nforens\tForensics\nosint\t  OSINT")
 					}
+					break
+				default:
+					msg.reply("Unknown command!")
 			}
-
 		}
 	}
 
