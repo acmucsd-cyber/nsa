@@ -1,4 +1,5 @@
 import Discord, { Client, Message, User } from 'discord.js'
+import { generateName } from './name-gen'
 
 export default class Bot {
 
@@ -61,6 +62,13 @@ export default class Bot {
 			const commandString: string[] = msg.content.substr(prefix.length).trim().split(' ')
 			
 			// process commands here
+			switch (commandString[0]) {
+				case "name":
+					msg.reply(`What about this?\n> ${generateName(commandString)}`)
+					break
+				default:
+					msg.reply("Unknown command!")
+			}
 		}
 	}
 
