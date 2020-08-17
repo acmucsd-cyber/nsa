@@ -21,7 +21,7 @@ export default class Bot {
         	this.client.on('guildMemberAdd', member =>
         	{
             		console.log("new member")
-            		member.send("Welcome to ACM Cyber's Discord! ACM Cyber is an ACM sub-org and community of all kinds of cybersecurity enthusiasts and hobbyists. This Discord server is our virtual home and a hub for our members -- it's where we will announce club activities and events, hold spontaneous discussions, post memes, and more! We welcome everyone from all skill levels and backgrounds. Read the rules in #rulesandinfo and once you introduce yourself in #introductions, you'll have access to the full server! Get your roles over in #roles, and join the discussion in #lobby!")
+            		member.send("Welcome to ACM Cyber's Discord! ACM Cyber is a community of all kinds of cybersecurity enthusiasts and hobbyists. In this server, we'll announce club activities and events, hold spontaneous discussions, post memes, and more! No experience is required to join ACM Cyber. To get started, read the rules in #rulesandinfo(and react to the message) and once you introduce yourself in #introductions, you'll have access to the full server! Get your roles over in #roles, and join the discussion in #lobby!")
                 		.catch(console.error);
         	})
         	//Giving users server access once they type in the introductions channel. Need to give the bot "manage roles" perms.
