@@ -1,6 +1,9 @@
 import adjNoun from 'adj-noun'
 import parser from 'yargs-parser'
+
 // const { ArgumentParser } = require('argparse');
+
+const SEED_RANGE = 2147483648; // must be significantly smaller than Number.MAX_SAFE_INTEGER or adj-noun may give undefined stuff on fractional values
 
 // const parser = new ArgumentParser({
 //     description: 'Username generator'
@@ -9,6 +12,7 @@ import parser from 'yargs-parser'
 // parser.add_argument('--leet', { action: "store_true", help: "Make your username l33t" })
 
 export function generateName(commandArgs: string[]): string {
+    adjNoun.seed(Math.floor(Math.random() * SEED_RANGE))
     // let args = parser.parse_args(commandArgs.slice(1))
     let args = parser(commandArgs.slice(1), {
         default: { leet: false, separator: ' ' },
