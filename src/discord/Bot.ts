@@ -2,11 +2,16 @@ import Discord, { Client, Message, User } from 'discord.js'
 import { generateName } from './name-gen'
 
 export default class Bot {
+	private initChallenges(flags: Flags): void {
+		console.log(`Flag for example_challenge: ${flags.example_challenge}`)
+		console.log(`Flag for challenge_2: ${flags.challenge_2}`)
+	}
 
 	constructor(
 		private readonly config: DiscordConfig,
 		private readonly client: Client = new Discord.Client()
 	) {
+		this.initChallenges(config.flags)
 		this.client.on('message', (msg: Message) => this.messageHandler.bind(this)(msg))
 		//Ping Test
 		this.client.on("message", msg =>
