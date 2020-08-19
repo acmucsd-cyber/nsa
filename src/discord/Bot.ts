@@ -63,9 +63,6 @@ export default class Bot {
 
 			// process commands here
 			switch (commandString[0]) {
-				case "name":
-					msg.reply(`What about this?\n> ${generateName(commandString)}`)
-					break
 				case "ping":
 					console.log("got a ping")
 					msg.reply("Pong!")
@@ -84,7 +81,7 @@ export default class Bot {
 					} else {
 						msg.reply("\nUsage: !toolkit [category] or !tk [category]\nRecommends toolkits for various CTF "
 							+ "categories\n\nCategories:\nrev\t\t  Reverse Engineering\nweb\t\tWeb\ncrypto\tCryptography\n"
-							+ "pwn\t\tPwnable\nsteg\t\tSteganography\nforens\tForensics\nosint\t  OSINT")
+							+ "pentest  Pen Testing\nsteg\t\tSteganography\nforens\tForensics\nosint\t  OSINT\nnet\t\t Network")
 					}
 					break
 				default:
