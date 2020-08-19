@@ -1,4 +1,5 @@
 import Discord, { Client, Message, User } from 'discord.js'
+import * as toolkit from './toolkit.json'
 import { generateName } from './name-gen'
 
 export default class Bot {
@@ -17,7 +18,7 @@ export default class Bot {
 		this.client.on("message", msg =>
         	{
             		if (msg.content === "ping")
-            		{		
+            		{
                 		console.log("got a ping")
                 		msg.reply("Pong!")
             		}
@@ -65,9 +66,30 @@ export default class Bot {
 
 		if (prefix) {
 			const commandString: string[] = msg.content.substr(prefix.length).trim().split(' ')
-			
+
 			// process commands here
 			switch (commandString[0]) {
+				case "ping":
+					console.log("got a ping")
+					msg.reply("Pong!")
+					break
+				case "toolkit":
+				case "tk":
+					let cat = commandString[1]
+					let tools: string = ""
+					let categories: string[] = Object.keys(toolkit)
+					if (categories.includes(cat)) {
+						Object.keys(toolkit[cat]).forEach(function(key) {
+							tools += '\nTool : ' + toolkit[cat][key].name + '\nDescription : ' + toolkit[cat][key].description
+								+ '\nurl: ' + toolkit[cat][key].url + '\n'
+						})
+						msg.reply(tools)
+					} else {
+						msg.reply("\nUsage: !toolkit [category] or !tk [category]\nRecommends toolkits for various CTF "
+							+ "categories\n\nCategories:\nrev\t\t  Reverse Engineering\nweb\t\tWeb\ncrypto\tCryptography\n"
+							+ "pentest  Pen Testing\nsteg\t\tSteganography\nforens\tForensics\nosint\t  OSINT\nnet\t\t Network")
+					}
+          break
 				case "name":
 					msg.reply(`What about this?\n> ${generateName(commandString)}`)
 					break
