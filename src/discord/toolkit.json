@@ -94,11 +94,6 @@
         "description": "RSA multi attacks tool : uncipher data from weak public key and try to recover private key Automatic selection of best attack for the given public key",
         "url": "https://github.com/Ganapati/RsaCtfTool"
     },
-    "diit": {
-        "name": "Digital Invisible Ink Toolkit (DIIT)",
-        "description": "Java steganography tool that can hide any sort of file inside a digital image",
-        "url": "http://diit.sourceforge.net/"
-    },
     "dcode": {
         "name": "DCode",
         "description": "Universal site for decoding messages, cheating on letter games, solving puzzles, geocaches and treasure hunts, etc",
@@ -125,6 +120,11 @@
         "name": "Image Steganography by James Stanley",
         "description": "A client-side Javascript tool to steganographically hide/unhide images inside the lower significant \"bits\" of other images.",
         "url": "https://incoherency.co.uk/image-steganography/"
+    },
+    "diit": {
+        "name": "Digital Invisible Ink Toolkit (DIIT)",
+        "description": "Java steganography tool that can hide any sort of file inside a digital image",
+        "url": "http://diit.sourceforge.net/"
     }
   },
   "forens": {
