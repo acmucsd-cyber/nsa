@@ -90,7 +90,7 @@
         "url": "https://cryptii.com/"
     },
     "rsactftool": {
-        "name": "RSACtfTool",
+        "name": "RsaCtfTool",
         "description": "RSA multi attacks tool : uncipher data from weak public key and try to recover private key Automatic selection of best attack for the given public key",
         "url": "https://github.com/Ganapati/RsaCtfTool"
     },
