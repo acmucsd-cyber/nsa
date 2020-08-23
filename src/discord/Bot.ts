@@ -9,7 +9,7 @@ export default class Bot {
 		private readonly client: Client = new Discord.Client()
 	) {
 		this.client.on('message', (msg: Message) => this.messageHandler.bind(this)(msg))
-		//Ping Test
+		// Ping Test
 		this.client.on("message", msg =>
         	{
             		if (msg.content === "ping")
@@ -18,14 +18,32 @@ export default class Bot {
                 		msg.reply("Pong!")
             		}
         	})
-        	//Sending new users a welcome DM
+		// !help commands
+		this.client.on('message', msg => {
+			if(msg.content === "!help") {
+				msg.reply('Hello! Welcome to ACM Cyber! Here are some help commands: \n\n- !Resources \n- !FAQ \n- !GettingStarted');
+			}
+			else if(msg.content === "!GettingStarted") {
+				msg.reply('One of the best ways to get started is by learning the basics of CTFs. A great place to start would be picoCTF. Head to the channel #intro-resources to get started.');
+			}
+			else if(msg.content === "!FAQ") {
+				msg.reply('\n\n\"What is the difference between ACM and ACM Cyber?\"\n\nACM is a chapter of the Association for Computing Machinery, a much larger community of students, developers, designers, and any industry professionals that uses computing in their daily lives. ACM Cyber is a sub-community of UC San Diego\'s ACM chapter, \
+but we are our own organization and focus specifically on cybersecurity while still engaging with the greater ACM community and benefitting from their backing and support for our activities.\n\n\"Can I still join even if I don’t have any cybersecurity experience?\"\n\nYes! We welcome anyone and everyone of all skill levels, and we hope that by sticking around \
+we can help you grow your own skillset and interests :)\n\n\"I want to compete in CTFs -- how do I join a team?\"\n\nAsk someone on discord to add you to the @Hacker role and\
+  you\'ll get notifications for all upcoming events. The Competition Committee is working to finalize the details, but for now we\'re all on one big team, and we\'d love to have you!');
+			}
+			else if(msg.content === "!Resources") {
+				msg.reply('Head over to the <Cyber> sector of our discord for tons of resources!');
+			}
+		})
+        	// Sending new users a welcome DM
         	this.client.on('guildMemberAdd', member =>
         	{
             		console.log("new member")
             		member.send("Welcome to ACM Cyber's Discord! ACM Cyber is a community of all kinds of cybersecurity enthusiasts and hobbyists. In this server, we'll announce club activities and events, hold spontaneous discussions, post memes, and more! No experience is required to join ACM Cyber. To get started, read the rules in #rulesandinfo(and react to the message) and once you introduce yourself in #introductions, you'll have access to the full server! Get your roles over in #roles, and join the discussion in #lobby!")
                 		.catch(console.error);
         	})
-        	//Giving users server access once they type in the introductions channel. Need to give the bot "manage roles" perms.
+        	// Giving users server access once they type in the introductions channel. Need to give the bot "manage roles" perms.
         	this.client.on("message", msg =>
         	{
             		if(msg.channel.id === '742797435520417828') //ID of introductions channel
