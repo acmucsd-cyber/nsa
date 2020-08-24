@@ -5,6 +5,11 @@
         "description": "The GNU Project debugger",
         "url": "https://www.gnu.org/software/gdb/"
     },
+    "gef": {
+        "name": "GEF",
+        "description": "GDB Enhanced Features, a set of commands for x86/64, ARM, MIPS, PowerPC and SPARC to assist exploit developers and reverse-engineers when using old school GDB",
+        "url": "https://github.com/hugsy/gef"
+    },
     "pwndbg": {
         "name": "pwndbg",
         "description": "GDB plug-in that makes debugging with GDB suck less, with a focus on features needed by low-level software developers, hardware hackers, reverse-engineers and exploit developers",
@@ -84,10 +89,10 @@
         "description": "Modular conversion, encoding and encryption online",
         "url": "https://cryptii.com/"
     },
-    "diit": {
-        "name": "Digital Invisible Ink Toolkit (DIIT)",
-        "description": "Java steganography tool that can hide any sort of file inside a digital image",
-        "url": "http://diit.sourceforge.net/"
+    "rsactftool": {
+        "name": "RsaCtfTool",
+        "description": "RSA multi attacks tool : uncipher data from weak public key and try to recover private key Automatic selection of best attack for the given public key",
+        "url": "https://github.com/Ganapati/RsaCtfTool"
     },
     "dcode": {
         "name": "DCode",
@@ -110,6 +115,16 @@
         "name": "Aperi'Solve",
         "description": "Online platform which performs layer analysis on image",
         "url": "https://aperisolve.fr/"
+    },
+    "imagelsb": {
+        "name": "Image Steganography by James Stanley",
+        "description": "A client-side Javascript tool to steganographically hide/unhide images inside the lower significant \"bits\" of other images.",
+        "url": "https://incoherency.co.uk/image-steganography/"
+    },
+    "diit": {
+        "name": "Digital Invisible Ink Toolkit (DIIT)",
+        "description": "Java steganography tool that can hide any sort of file inside a digital image",
+        "url": "http://diit.sourceforge.net/"
     }
   },
   "forens": {
@@ -144,6 +159,11 @@
         "name": "theHarvester",
         "description": "Gathers emails, names, subdomains, IPs and URLs using multiple public data sources",
         "url": "https://github.com/laramies/theHarvester"
+    },
+    "intelowl": {
+        "name": "Intel Owl",
+        "description": "Scans files, IPs, and domains to gather threat intelligence data in a single API request",
+        "url": "https://github.com/intelowlproject/IntelOwl"
     }
   },
   "web": {
