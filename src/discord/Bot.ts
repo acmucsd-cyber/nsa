@@ -24,7 +24,6 @@ export default class Bot {
 			});
 		});
 		this.client.on('messageReactionAdd', async (reaction, user) => {
-			reaction.message.channel.send(reaction.emoji.id);
 			if (reaction.message.channel.id === roles.channelID){ //Roles Channel ID
 			  const memberRoles = reaction.message.guild?.member(user.id)?.roles;
 			  const roleID = roles.roles[reaction.emoji.id][0];
@@ -113,9 +112,11 @@ we can help you grow your own skillset and interests :)\n\n\"I want to compete i
 				case "roles":
 					if (msg.channel.id !== roles.channelID){ //ID of the roles channel
 						reply["embed"]["description"] = ("Please only use this command in the roles channel!");
+						break;
 					}
 					if (!(msg.member.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
 						reply["embed"]["description"] = ("Only Goons, Admins, Board, or Bot Devs can use this command");
+						break;
 					}
 					msg.channel.bulkDelete(10, true);
 					for (var i in roles.embeds){
@@ -126,12 +127,21 @@ we can help you grow your own skillset and interests :)\n\n\"I want to compete i
 					reply["embed"]["description"] = "Roles last updated on " + d.toString();
 					break;
 				case "roleremove":
+					if (commandString.length !== 2){
+						reply["embed"]["description"] = "Please specify a single role that you have to remove";
+						break;
+					}
+					if(!msg.member.roles.cache.find(r => r.name === commandString[1])){
+						reply["embed"]["description"] = "You don't have that role.";
+						break;
+					}
 					for (var key in roles.roles) { 
 						if (roles.roles[key][1] === commandString[1]){
 							msg.guild?.member(msg.member.user.id)?.roles.remove(roles.roles[key][0]);
 							reply["embed"]["description"] = ("Removed you from the " + commandString[1] + " role.");
+							break;
 						} else{
-							reply["embed"]["description"] = "You don't have that role.";
+							reply["embed"]["description"] = "That role can't be removed, sorry. Ask a Goon or Admin to remove it for you.";
 						}
 					}
 					break;
