@@ -2,21 +2,20 @@ import Discord, { Client, Message, User } from 'discord.js'
 import * as toolkit from './toolkit.json'
 import { generateName } from './name-gen'
 import * as roles from "./roles.json"
+import { CTF } from "./ctf"
 
 export default class Bot {
 	private readonly client: Client;
 	private readonly config: DiscordConfig;
-
-	private initChallenges(flags: Flags): void {
-		console.log(`Flag for example_challenge: ${flags.example_challenge}`)
-		console.log(`Flag for challenge_2: ${flags.challenge_2}`)
-	}
+	private readonly ctf: CTF;
+	// private checkingFlag = false;
+	private checkingFlag = new Set<User>();
 
 	constructor(config: DiscordConfig)
 	{
 		this.client = new Discord.Client();
 		this.config = config;
-		this.initChallenges(config.flags);
+		this.ctf = new CTF(config.flags);
 	}
 
 	public listen(): Promise <string> {
@@ -55,7 +54,73 @@ export default class Bot {
 		});
 		return this.client.login(this.config.token);
 	}
-	
+
+	private processCTFCommand(commandArgs: string[], invoker: User, msgReply: (msg: string) => void): string {
+		// let badUsage = false;
+		let error = "";
+		let template = `Usage: ${this.config.prefix}ctf`;
+		let flagHelp = `${template} flag CHALLENGE_NAME FLAG`;
+		if (commandArgs.length == 0) {
+			error = "Error: No command specified\n";
+		} else {
+			switch (commandArgs[0]) {
+				case "flag":
+					let cmdError = "";
+					if (commandArgs.length == 3) {
+						let chalName = commandArgs[1];
+						if (this.ctf.validateChallengeName(chalName)) {
+							if (this.checkingFlag.has(invoker)) {
+								return `Please wait for your last flag submission to be processed first.`;
+							}
+							setTimeout(() => {
+								this.checkingFlag.delete(invoker);
+								let reply: string, correct = this.ctf.checkFlag(chalName, commandArgs[2]);
+								if (correct) {
+									reply = `Congratulations! 🎉 You captured the flag for ${chalName}.`;
+									console.log(`User ${invoker.username} captured the flag for ${chalName}!`);
+									// TODO record this capture by this user.
+								} else {
+									reply = `Sorry, your flag for ${chalName} is incorrect.`;
+								}
+								msgReply(reply);
+							}, 1000 + Math.random() * 2000); // TODO if it fails (with an exception) automatically delete invoker from this.checkingFlag to avoid deadlocks
+							// timeout range from 1 to 3 seconds
+							this.checkingFlag.add(invoker);
+							return `Checking flag for ${chalName}...`;
+						} else {
+							cmdError = `Error: ${chalName} is not a challenge name.\n`;
+							// TODO: give a list of valid challenge names
+						}
+					} else {
+						cmdError = "Error: You must specify both the challenge name and the flag you want to submit";
+					}
+					return cmdError + flagHelp;
+				// TODO: a command to read challenge description
+				case "help":
+					if (commandArgs.length == 2) {
+						switch (commandArgs[1]) {
+							case "flag":
+								return flagHelp;
+							case "help":
+								break;
+							default:
+								error = `Error: ${commandArgs[1]} is not a command\n`;
+						}
+					}/*  else {
+						error = "Error: please specify a command to get help on";
+					} */
+					break;
+				default:
+					error = `Error: ${commandArgs[0]} is not a command\n`;
+			}
+		}
+		return `${error}${template} COMMAND\n\nwhere COMMAND is one of the following:\nflag: submit and check CTF flag\nhelp COMMAND: get help on a specific command`;
+	}
+
+	private replyTemplate() {
+		return {embed :{color: 0x800000, title:"NSA", url : "http://github.com/acmucsd-cyber/nsa", thumbnail: "",description : ""}};
+	}
+
 	private messageHandle(msg: Message, config: DiscordConfig): Promise<Message | Message[]>{
 		if (!msg.content.startsWith(config.prefix)){
 			// Ping Test
@@ -80,7 +145,8 @@ export default class Bot {
 			}
 		} else {
 			const commandString: string[] = msg.content.substr(config.prefix.length).trim().split(' ');
-			var reply = {embed :{color: 0x800000, title:"NSA", url : "http://github.com/acmucsd-cyber/nsa", thumbnail: "",description : ""}};
+			// var reply = {embed :{color: 0x800000, title:"NSA", url : "http://github.com/acmucsd-cyber/nsa", thumbnail: "",description : ""}};
+			let reply = this.replyTemplate();
 			switch (commandString[0].toLowerCase()) {
 				case "toolkit":
 				case "tk":
@@ -141,6 +207,13 @@ we can help you grow your own skillset and interests :)\n\n\"I want to compete i
 							reply["embed"]["description"] = "You don't have that role.";
 						}
 					}
+					break;
+				case "ctf":
+					reply["embed"]["description"] = this.processCTFCommand(commandString.slice(1), msg.author, (ctfReplyMsg) => {
+						let ctfReply = this.replyTemplate();
+						ctfReply["embed"]["description"] = ctfReplyMsg;
+						msg.channel.send(ctfReply);
+					});
 					break;
 				default:
 					reply["embed"]["description"] = "Unknown command!";
