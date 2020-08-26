@@ -2,6 +2,7 @@ import Discord, { Client, Message, User } from 'discord.js'
 import * as toolkit from './toolkit.json'
 import { generateName } from './name-gen'
 import * as roles from "./roles.json"
+import * as command from "./command-strings.json"
 
 export default class Bot {
 	private readonly client: Client;
@@ -72,50 +73,34 @@ export default class Bot {
 			}
 		} else {
 			const commandString: string[] = msg.content.substr(config.prefix.length).trim().split(' ');
-			var reply = {embed :{color: 0x800000, title:"NSA", url : "http://github.com/acmucsd-cyber/nsa", thumbnail: "",description : ""}};
+			var reply = {embed :{color: command.generic.color, title: command.generic.title, url : command.generic.url, footer: command.generic.footer, description : "", fields : []}};
 			switch (commandString[0].toLowerCase()) {
 				case "toolkit":
 				case "tk":
 					let cat = commandString[1];
-					let tools: string = "";
 					let categories: string[] = Object.keys(toolkit);
 					if (categories.includes(cat)) {
-						Object.keys(toolkit[cat]).forEach(function(key) {
-							tools += '\nTool : ' + toolkit[cat][key].name + '\nDescription : ' + toolkit[cat][key].description
-								+ '\nurl: ' + toolkit[cat][key].url + '\n';
-						});
-						reply["embed"]["description"] = tools;
+						reply["embed"]["fields"] = toolkit[cat].fields;
 					} else {
-						reply["embed"]["description"] = ("\nUsage: !toolkit [category] or !tk [category]\nRecommends toolkits for various CTF "
-							+ "categories\n\nCategories:\nrev\t\t  Reverse Engineering\nweb\t\tWeb\ncrypto\tCryptography\n"
-							+ "pentest  Pen Testing\nsteg\t\tSteganography\nforens\tForensics\nosint\t  OSINT\nnet\t\t Network");
+						reply["embed"]["fields"] = command.toolkit.fields;
 					}
           			break;
 				case "name":
 					reply["embed"]["description"] = `What about this name:\n **${generateName(commandString)}**`;
 					break;
 				case "help":
-					reply["embed"]["description"] = 'Hello! Welcome to ACM Cyber! Here are some help commands: \n\n- !Resources \n- !FAQ \n- !GettingStarted';
-					break;
 				case "gettingstarted":
-					reply["embed"]["description"] = 'One of the best ways to get started is by learning the basics of CTFs. A great place to start would be picoCTF. Head to the channel #intro-resources and look at the pinned messages to get started.';
-					break;
 				case "faq":
-					reply["embed"]["description"] = '\n\n\"What is the difference between ACM and ACM Cyber?\"\n\nACM is a chapter of the Association for Computing Machinery, a much larger community of students, developers, designers, and any industry professionals that uses computing in their daily lives. ACM Cyber is a sub-community of UC San Diego\'s ACM chapter, \
-but we are our own organization and focus specifically on cybersecurity while still engaging with the greater ACM community and benefitting from their backing and support for our activities.\n\n\"Can I still join even if I don’t have any cybersecurity experience?\"\n\nYes! We welcome anyone and everyone of all skill levels, and we hope that by sticking around \
-we can help you grow your own skillset and interests :)\n\n\"I want to compete in CTFs -- how do I join a team?\"\n\nAsk someone on discord to add you to the @Hacker role and\
-  you\'ll get notifications for all upcoming events. The Competition Committee is working to finalize the details, but for now we\'re all on one big team, and we\'d love to have you!';
-					break;
 				case "resources":
-					reply["embed"]["description"] = 'Head over to the <Cyber> sector of our discord for tons of resources!';
+					reply["embed"]["fields"] = command[commandString[0]].fields;
 					break;
 				case "roles":
-					if (msg.channel.id !== roles.channelID){ //ID of the roles channel
-						reply["embed"]["description"] = ("Please only use this command in the roles channel!");
+					if (!(msg.member.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
+						reply["embed"]["description"] = ("Only Goons, Admins, Board, or Bot Devs can use this command. Check out <#742797364544143435> to get roles.");
 						break;
 					}
-					if (!(msg.member.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
-						reply["embed"]["description"] = ("Only Goons, Admins, Board, or Bot Devs can use this command");
+					if (msg.channel.id !== roles.channelID){ //ID of the roles channel
+						reply["embed"]["description"] = ("Please only use this command in the roles channel!");
 						break;
 					}
 					msg.channel.bulkDelete(10, true);
@@ -128,7 +113,7 @@ we can help you grow your own skillset and interests :)\n\n\"I want to compete i
 					break;
 				case "roleremove":
 					if (commandString.length !== 2){
-						reply["embed"]["description"] = "Please specify a single role that you have to remove";
+						reply["embed"]["description"] = "Usage: ```-roleremove [role]```";
 						break;
 					}
 					if(!msg.member.roles.cache.find(r => r.name === commandString[1])){
