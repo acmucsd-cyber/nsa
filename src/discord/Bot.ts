@@ -60,7 +60,7 @@ export default class Bot {
 				// Giving users server access once they type in the introductions channel.
 				if(msg.channel.id === '742797435520417828' //Message is in the introductions channel
 				&& msg.content.includes(' ') //Message is longer than one word
-				&& msg.member != null // just in case it is
+				&& msg.member !== null // just in case it is
 				&& !(msg.member.roles.cache.has('742797850630684762'))) //ID of "member" role
                 {
                     console.log("Gave member role to " + msg.member.user.tag);
@@ -96,11 +96,7 @@ export default class Bot {
 					reply["embed"]["fields"] = command[commandString[0]].fields;
 					break;
 				case "roles":
-					if (msg.member == null) {
-						reply["embed"]["description"] = "Cannot assign role. Make sure you are messaging me in any ACM Cyber channel and not in DM."
-						break;
-					}
-					if (!(msg.member.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
+					if (!(msg.member?.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
 						reply["embed"]["description"] = ("Only Goons, Admins, Board, or Bot Devs can use this command. Check out [redacted for server safety] to get roles.");
 						break;
 					}
@@ -121,7 +117,7 @@ export default class Bot {
 						reply["embed"]["description"] = "Usage: ```-roleremove [role]```";
 						break;
 					}
-					if (msg.member == null) {
+					if (msg.member === null) {
 						reply["embed"]["description"] = "Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM."
 						break;
 					}
