@@ -96,7 +96,7 @@ export default class Bot {
 					break;
 				case "roles":
 					if (!(msg.member.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
-						reply["embed"]["description"] = ("Only Goons, Admins, Board, or Bot Devs can use this command. Check out <#742797364544143435> to get roles.");
+						reply["embed"]["description"] = ("Only Goons, Admins, Board, or Bot Devs can use this command. Check out [redacted for server safety] to get roles.");
 						break;
 					}
 					if (msg.channel.id !== roles.channelID){ //ID of the roles channel
