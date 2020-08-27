@@ -111,7 +111,7 @@ export default class Bot {
 						reply["embed"]["description"] = ("Please only use this command in the roles channel!");
 						break;
 					}
-					msg.channel.bulkDelete(1, true);
+					msg.channel.bulkDelete(10, true);
 					Object.keys(roles.embeds).forEach(key => {
 						msg.channel.send({ embed: roles.embeds[key] }).then((reactMessage) => {
 						  Object.keys(roles.roles[key]).forEach(emote => {
