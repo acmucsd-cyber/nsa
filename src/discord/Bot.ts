@@ -160,7 +160,7 @@ export default class Bot {
 	public connect(): void {
 		// Confirms the connection to Discord
 		console.log('Logged in as: ' + this.client.user.tag)
-		this.client.user.setActivity('Probably broken again', { type: 'CUSTOM_STATUS' });
+		this.client.user.setActivity('You', { type: 'WATCHING' });
 	}
 
 }
