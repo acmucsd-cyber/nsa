@@ -85,10 +85,8 @@ export default class Bot {
 			switch (commandString[0].toLowerCase()) {
 				case "toolkit":
 				case "tk":
-					let cat = commandString[1];
-					let categories: string[] = Object.keys(toolkit);
-					if (categories.includes(cat)) {
-						reply["embed"]["fields"] = toolkit[cat].fields;
+					if (Object.keys(toolkit).includes(commandString[1])) {
+						reply["embed"]["fields"] = toolkit[commandString[1]].fields;
 					} else {
 						reply["embed"]["fields"] = command.toolkit.fields;
 					}
@@ -114,13 +112,12 @@ export default class Bot {
 					msg.channel.bulkDelete(10, true);
 					Object.keys(roles.embeds).forEach(key => {
 						msg.channel.send({ embed: roles.embeds[key] }).then((reactMessage) => {
-						  Object.keys(roles.roles[key]).forEach(emote => {
-							reactMessage.react(emote);
-						  })
+							Object.keys(roles.roles[key]).forEach(emote => {
+								reactMessage.react(emote);
+							})
 						})
-					  })
-					const d = new Date();
-					reply["embed"]["description"] = "Roles last updated on " + d.toString();
+					})
+					reply["embed"]["description"] = `Roles last updated on  ${new Date().toString()}`;
 					break;
 				case "roleremove":
 					if (commandString.length !== 2){
