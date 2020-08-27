@@ -3,7 +3,6 @@ import * as toolkit from './toolkit.json'
 import { generateName } from './name-gen'
 import * as roles from "./roles.json"
 import * as command from "./command-strings.json"
-
 export default class Bot {
 	private readonly client: Client;
 	private readonly config: DiscordConfig;
@@ -25,21 +24,29 @@ export default class Bot {
 			});
 		});
 		this.client.on('messageReactionAdd', async (reaction, user) => {
-			if (reaction.message.channel.id === roles.channelID){ //Roles Channel ID
-			  const memberRoles = reaction.message.guild?.member(user.id)?.roles;
-			  const roleID = roles.roles[reaction.emoji.id][0];
-			  if(roles.roles.hasOwnProperty(reaction.emoji.id) && !memberRoles.cache.some(role => role.id === roleID)){
-				memberRoles.add(roleID);
-			  }
+			if (reaction.message.channel.id === roles.channelID && !user.bot){ //Roles Channel ID
+				const memberRoles = reaction.message.guild?.member(user.id)?.roles;
+				Object.keys(roles.roles).forEach(category => {
+					Object.keys(roles.roles[category]).forEach(id =>{
+						if (id === reaction.emoji.id && !memberRoles.cache.some(role => role.id === roles.roles[category][id][0])){
+							console.log(`Added ${user.username} to the ${roles.roles[category][id][1]} role`);
+							memberRoles.add(roles.roles[category][id][0]);
+						}
+					})
+				})
 			}
 		});
 		this.client.on('messageReactionRemove', async (reaction, user) => {
-			if (reaction.message.channel.id === roles.channelID){ //Roles Channel ID
+			if (reaction.message.channel.id === roles.channelID && !user.bot){ //Roles Channel ID
 				const memberRoles = reaction.message.guild?.member(user.id)?.roles;
-				const roleID = roles.roles[reaction.emoji.id][0];
-				if(roles.roles.hasOwnProperty(reaction.emoji.id) && memberRoles.cache.some(role => role.id === roleID)){
-					memberRoles.remove(roleID);
-			  	}
+				Object.keys(roles.roles).forEach(category => {
+					Object.keys(roles.roles[category]).forEach(id =>{
+						if (id === reaction.emoji.id && memberRoles.cache.some(role => role.id === roles.roles[category][id][0])){
+							console.log(`Removed ${user.username} from the ${roles.roles[category][id][1]} role`);
+							memberRoles.remove(roles.roles[category][id][0]);
+						}
+					})
+				})
 			}
 		});
 		this.client.on('guildMemberAdd', member => {
@@ -58,7 +65,7 @@ export default class Bot {
                 return msg.reply("Pong!");
 			} else {
 				// Giving users server access once they type in the introductions channel.
-				if(msg.channel.id === '742797435520417828' //Message is in the introductions channel
+				if(msg.channel.id === roles.channelID //Message is in the introductions channel
 				&& msg.content.includes(' ') //Message is longer than one word
 				&& msg.member !== null // just in case it is
 				&& !(msg.member.roles.cache.has('742797850630684762'))) //ID of "member" role
@@ -104,12 +111,15 @@ export default class Bot {
 						reply["embed"]["description"] = ("Please only use this command in the roles channel!");
 						break;
 					}
-					msg.channel.bulkDelete(10, true);
-					for (var i in roles.embeds){
-						var text = roles.embeds[i];
-						msg.channel.send({embed: text});
-					}
-					var d = new Date();
+					msg.channel.bulkDelete(1, true);
+					Object.keys(roles.embeds).forEach(key => {
+						msg.channel.send({ embed: roles.embeds[key] }).then((reactMessage) => {
+						  Object.keys(roles.roles[key]).forEach(emote => {
+							reactMessage.react(emote);
+						  })
+						})
+					  })
+					const d = new Date();
 					reply["embed"]["description"] = "Roles last updated on " + d.toString();
 					break;
 				case "roleremove":
@@ -121,20 +131,21 @@ export default class Bot {
 						reply["embed"]["description"] = "Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM."
 						break;
 					}
-					if(!msg.member.roles.cache.find(r => r.name === commandString[1])){
+					if(!msg.member.roles.cache.find(r => r.name.toLowerCase() === commandString[1])){
 						reply["embed"]["description"] = "You don't have that role.";
 						break;
 					}
-					for (var key in roles.roles) { 
-						if (roles.roles[key][1] === commandString[1]){
-							msg.guild?.member(msg.member.user.id)?.roles.remove(roles.roles[key][0]);
-							reply["embed"]["description"] = ("Removed you from the " + commandString[1] + " role.");
-							break;
-						} else{
-							reply["embed"]["description"] = "That role can't be removed, sorry. Ask a Goon or Admin to remove it for you.";
-						}
-					}
-					break;
+					reply["embed"]["description"] = "That role can't be removed, sorry. Ask a Goon or Admin to remove it for you."
+					Object.keys(roles.roles).forEach(category => {
+						Object.keys(roles.roles[category]).forEach(id =>{
+							if (roles.roles[category][id][1] === commandString[1]){
+								msg.guild?.member(msg.member.user.id)?.roles.remove(roles.roles[category][id][0]);
+								reply["embed"]["description"] = `Removed you from the ${commandString[1]} role.`;
+								console.log(`Removed ${msg.member.user.username} from the ${roles.roles[category][id][1]} role`);
+							}
+						})
+					});
+					break;		
 				default:
 					reply["embed"]["description"] = "Unknown command!";
 			}
@@ -149,7 +160,7 @@ export default class Bot {
 	public connect(): void {
 		// Confirms the connection to Discord
 		console.log('Logged in as: ' + this.client.user.tag)
-		this.client.user.setActivity('you 👁', { type: 'WATCHING' });
+		this.client.user.setActivity('Probably broken again', { type: 'CUSTOM_STATUS' });
 	}
 
 }
