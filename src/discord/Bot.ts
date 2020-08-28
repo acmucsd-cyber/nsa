@@ -1,15 +1,16 @@
-import Discord, { Client, Message, User } from 'discord.js'
+import { Client, Message, User } from 'discord.js'
 import * as toolkit from './toolkit.json'
-import { generateName } from './name-gen'
 import * as roles from "./roles.json"
 import * as command from "./command-strings.json"
+import { generateName } from './name-gen'
+import * as functions from "./functions"
 export default class Bot {
 	private readonly client: Client;
 	private readonly config: DiscordConfig;
 
 	constructor(config: DiscordConfig)
 	{
-		this.client = new Discord.Client();
+		this.client = new Client();
 		this.config = config;
 
 	}
@@ -24,7 +25,8 @@ export default class Bot {
 			});
 		});
 		this.client.on('messageReactionAdd', async (reaction, user) => {
-			if (reaction.message.channel.id === roles.channelID && !user.bot){ //Roles Channel ID
+			if (user.bot) return;
+			if (reaction.message.channel.id === roles.channelID){ //Roles Channel ID
 				const memberRoles = reaction.message.guild?.member(user.id)?.roles;
 				Object.keys(roles.roles).forEach(category => {
 					Object.keys(roles.roles[category]).forEach(id =>{
@@ -37,7 +39,8 @@ export default class Bot {
 			}
 		});
 		this.client.on('messageReactionRemove', async (reaction, user) => {
-			if (reaction.message.channel.id === roles.channelID && !user.bot){ //Roles Channel ID
+			if (user.bot) return;
+			if (reaction.message.channel.id === roles.channelID){ //Roles Channel ID
 				const memberRoles = reaction.message.guild?.member(user.id)?.roles;
 				Object.keys(roles.roles).forEach(category => {
 					Object.keys(roles.roles[category]).forEach(id =>{
@@ -80,71 +83,30 @@ export default class Bot {
 				return Promise.reject();
 			}
 		} else {
-			const commandString: string[] = msg.content.substr(config.prefix.length).trim().split(' ');
-			var reply = {embed :{color: command.generic.color, title: command.generic.title, url : command.generic.url, footer: command.generic.footer, description : "", fields : []}};
+			const commandString = msg.content.substr(config.prefix.length).trim().split(' ');
+			const reply = {embed :{color: command.generic.color, title: command.generic.title, url : command.generic.url, footer: command.generic.footer, description : "", fields : []}};
 			switch (commandString[0].toLowerCase()) {
 				case "toolkit":
 				case "tk":
-					if (Object.keys(toolkit).includes(commandString[1])) {
-						reply["embed"]["fields"] = toolkit[commandString[1]].fields;
-					} else {
-						reply["embed"]["fields"] = command.toolkit.fields;
-					}
+					reply.embed.fields = functions.tk(commandString);
           			break;
 				case "name":
-					reply["embed"]["description"] = `What about this name:\n **${generateName(commandString)}**`;
+					reply.embed.description = `What about this name:\n **${generateName(commandString)}**`;
 					break;
 				case "help":
 				case "gettingstarted":
 				case "faq":
 				case "resources":
-					reply["embed"]["fields"] = command[commandString[0]].fields;
+					reply.embed.fields = command[commandString[0]].fields;
 					break;
 				case "roles":
-					if (!(msg.member?.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
-						reply["embed"]["description"] = ("Only Goons, Admins, Board, or Bot Devs can use this command. Check out [redacted for server safety] to get roles.");
-						break;
-					}
-					if (msg.channel.id !== roles.channelID){ //ID of the roles channel
-						reply["embed"]["description"] = ("Please only use this command in the roles channel!");
-						break;
-					}
-					msg.channel.bulkDelete(10, true);
-					Object.keys(roles.embeds).forEach(key => {
-						msg.channel.send({ embed: roles.embeds[key] }).then((reactMessage) => {
-							Object.keys(roles.roles[key]).forEach(emote => {
-								reactMessage.react(emote);
-							})
-						})
-					})
-					reply["embed"]["description"] = `Roles last updated on  ${new Date().toString()}`;
+					reply.embed.description = functions.Roles(msg);
 					break;
 				case "roleremove":
-					if (commandString.length !== 2){
-						reply["embed"]["description"] = "Usage: ```-roleremove [role]```";
-						break;
-					}
-					if (msg.member === null) {
-						reply["embed"]["description"] = "Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM."
-						break;
-					}
-					if(!msg.member.roles.cache.find(r => r.name.toLowerCase() === commandString[1])){
-						reply["embed"]["description"] = "You don't have that role.";
-						break;
-					}
-					reply["embed"]["description"] = "That role can't be removed, sorry. Ask a Goon or Admin to remove it for you."
-					Object.keys(roles.roles).forEach(category => {
-						Object.keys(roles.roles[category]).forEach(id =>{
-							if (roles.roles[category][id][1] === commandString[1]){
-								msg.guild?.member(msg.member.user.id)?.roles.remove(roles.roles[category][id][0]);
-								reply["embed"]["description"] = `Removed you from the ${commandString[1]} role.`;
-								console.log(`Removed ${msg.member.user.username} from the ${roles.roles[category][id][1]} role`);
-							}
-						})
-					});
+					reply.embed.description = functions.roleremove(msg, commandString);
 					break;		
 				default:
-					reply["embed"]["description"] = "Unknown command!";
+					reply.embed.description = "Unknown command!";
 			}
 			return msg.channel.send(reply);
 		}
