@@ -1,62 +1,60 @@
 {
-    "generic":{
-        "title": "NSA",
-        "url": "http://github.com/acmucsd-cyber/nsa",
-        "color": 8388608,
-        "footer": {
-            "text": "I'm Watching You 👁️"
+  "commands" :[
+    {
+      "name" : "toolkit",
+      "fields": [
+        {
+          "name": "Usage:",
+          "value": "```-toolkit [category] ```or ```-tk [category]```\n"
+        },
+        {
+          "name": "Description",
+          "value": "Recommends toolkits for various CTF categories including:\n*rev* -> Reverse Engineering\n*web*       -> Web\n*crypto* -> Cryptography\n*pentest* -> Pen Testing \n*steg* -> Steganography\n*forens* -> Forensics\n*osint* -> Open Source Intelligence\n*net* -> Network"
         }
+      ]
     },
-    "toolkit" : {
-        "fields": [
-            {
-            "name": "Usage:",
-            "value": "```-toolkit [category] ```or ```-tk [category]```\n"
-            },
-            {
-            "name": "Description",
-            "value": "Recommends toolkits for various CTF categories including:\n*rev* -> Reverse Engineering\n*web*       -> Web\n*crypto* -> Cryptography\n*pentest* -> Pen Testing \n*steg* -> Steganography\n*forens* -> Forensics\n*osint* -> Open Source Intelligence\n*net* -> Network"
-            }
-        ]
-      },
-    "help" :  {
-        "fields": [
-          {
-            "name": "User Commands:",
-            "value": "```\n-help\n-resources \n-FAQ\n-GettingStarted\n-toolkit or -tk\n-roleremove\n```"
-          },
-          {
-            "name": "Goon / Admin Commands:",
-            "value": "```\n-roles\n```"
-          }
-        ]
+    {
+      "name" : "help",
+      "fields": [
+        {
+          "name": "User Commands:",
+          "value": "```\n-help\n-resources \n-FAQ\n-GettingStarted\n-toolkit or -tk\n-roleremove\n```"
+        },
+        {
+          "name": "Goon / Admin Commands:",
+          "value": "```\n-roles\n```"
+        }
+      ]
     },
-    "gettingstarted" : {
-        "fields": [
+    {
+      "name" : "gettingstarted",
+      "fields": [
         {
           "name": "Get Started:",
           "value": "One of the best ways to get started is by learning the basics of CTFs. A great place to start would be picoCTF. Head to  [redacted for server safety] and look at the pinned messages to get started."
         }
       ]
     },
-    "faq" : {
-        "fields": [
-            {
-              "name": "What is the difference between ACM and ACM Cyber?",
-              "value": "ACM or the Association for Computing Machinery is a global community of students, developers, designers, and any industry professionals that uses computing in their daily lives. ACM-Cyber is a sub-community of UC San Diego's ACM chapter, functioning as an independent organization focused specifically on cyber-security while still engaging with the greater ACM community."
-            },
-            {
-              "name": "Can I still participate even if I don’t have any cybersecurity experience?",
-              "value": "Yes! We welcome anyone and everyone of all skill levels, and we hope that by sticking around we can help you grow your own skill-set and interests."
-            },
-            {
-              "name": "I want to compete in CTFs -- how do I join a team?",
-              "value": "Use the roles channel to give yourself the @Hacker role and you'll get notifications for all upcoming events. For now, all are welcome to partake in any competition, regardless of skill level."
-            },
-            {
-              "name": "What if I have another question not listed here?",
-              "value": "Feel free to ask anyone with a Goon or Admin rank at any time!"
-            }
-          ]
+    {
+      "name" : "faq",
+      "fields": [
+        {
+          "name": "What is the difference between ACM and ACM Cyber?",
+          "value": "ACM or the Association for Computing Machinery is a global community of students, developers, designers, and any industry professionals that uses computing in their daily lives. ACM-Cyber is a sub-community of UC San Diego's ACM chapter, functioning as an independent organization focused specifically on cyber-security while still engaging with the greater ACM community."
+        },
+        {
+          "name": "Can I still participate even if I don’t have any cybersecurity experience?",
+          "value": "Yes! We welcome anyone and everyone of all skill levels, and we hope that by sticking around we can help you grow your own skill-set and interests."
+        },
+        {
+          "name": "I want to compete in CTFs -- how do I join a team?",
+          "value": "Use the roles channel to give yourself the @Hacker role and you'll get notifications for all upcoming events. For now, all are welcome to partake in any competition, regardless of skill level."
+        },
+        {
+          "name": "What if I have another question not listed here?",
+          "value": "Feel free to ask anyone with a Goon or Admin rank at any time!"
+        }
+      ]
     }
+  ] 
 }

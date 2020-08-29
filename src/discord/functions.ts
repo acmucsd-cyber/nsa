@@ -1,7 +1,7 @@
 import * as roles from "./roles.json"
 import { Message, MessageEmbed } from "discord.js"
 import * as toolkit from './toolkit.json'
-import * as command from "./command-strings.json"
+import {commands} from "./command-strings.json"
 import {channels} from "../config.json"
 
 export const Roles = (msg: Message, $embed: MessageEmbed) => {
@@ -55,13 +55,9 @@ export const roleremove = (msg: Message, commandString: string[], $embed: Messag
 
 export const tk = (commandString: string[], $embed: MessageEmbed) => {
     if (Object.keys(toolkit).includes(commandString[1])) {
-        toolkit[commandString[1]].fields.forEach(field => {
-            $embed.addField(field.name, field.value);
-        });
+        $embed.addFields(toolkit[commandString[1]].fields);
     } else {
-        command.toolkit.fields.forEach(field => {
-            $embed.addField(field.name, field.value);
-        });
+        $embed.addFields(commands.find(command => command.name === "toolkit").fields);
     }
     return;
 }

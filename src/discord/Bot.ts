@@ -1,7 +1,7 @@
 import { Client, Message, User, MessageEmbed } from 'discord.js'
 import * as toolkit from './toolkit.json'
 import * as roles from "./roles.json"
-import * as command from "./command-strings.json"
+import {commands} from "./command-strings.json"
 import { generateName } from './name-gen'
 import * as functions from "./functions"
 import { channels } from "../config.json"
@@ -87,10 +87,10 @@ export default class Bot {
 		} else {
 			const commandString = msg.content.substr(config.prefix.length).trim().split(' ');
 			const reply = new MessageEmbed()
-				.setColor(command.generic.color)
-				.setTitle(command.generic.title)
-				.setURL(command.generic.url)
-				.setFooter(command.generic.footer.text);
+				.setColor(8388608)
+				.setTitle("NSA")
+				.setURL("http://github.com/acmucsd-cyber/nsa")
+				.setFooter("I'm Watching You 👁️");
 			
 			switch (commandString[0].toLowerCase()) {
 				case "toolkit":
@@ -103,9 +103,7 @@ export default class Bot {
 				case "help":
 				case "gettingstarted":
 				case "faq":
-					command[commandString[0]].fields.forEach(field => {
-						reply.addField(field.name, field.value);
-					});
+					reply.addFields(commands.find(command => command.name === commandString[0]).fields);
 					break;
 				case "resources":
 					functions.resources(reply);
