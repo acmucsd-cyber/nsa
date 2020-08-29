@@ -58,17 +58,5 @@
               "value": "Feel free to ask anyone with a Goon or Admin rank at any time!"
             }
           ]
-    },
-    "resources" : {
-        "fields": [
-            {
-              "name": "General Resources",
-              "value": "[redacted for server safety]"
-            },
-            {
-              "name": "Capture the Flag",
-              "value": "[redacted for server safety]"
-            }
-          ]
     }
 }
