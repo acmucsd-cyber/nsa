@@ -1,4 +1,4 @@
-import * as roles from "./roles.json"
+import {roles} from "./roles.json"
 import { Message, MessageEmbed } from "discord.js"
 import * as toolkit from './toolkit.json'
 import {commands} from "./command-strings.json"
@@ -14,14 +14,21 @@ export const Roles = (msg: Message, $embed: MessageEmbed) => {
         return;
     }
     msg.channel.bulkDelete(10, true);
-    Object.keys(roles.embeds).forEach(key => {
-        msg.channel.send({ embed: roles.embeds[key] })
-            .then((reactMessage) => {
-                Object.keys(roles.roles[key]).forEach(emote => {
-                    reactMessage.react(emote);
+    let roleCat = new MessageEmbed; 
+    roles.forEach(category => {
+        roleCat = new MessageEmbed()
+            .setColor(8388608);
+        roleCat.setTitle(category.category);
+        category.roles.forEach(role => {
+            roleCat.addField(role.name, `<:${role.name.toLowerCase().replace('-', '')}:${role.emoteID}>`);
+        });
+        msg.channel.send(roleCat)
+            .then(reactMessage => {
+                category.roles.forEach(role => {
+                    reactMessage.react(role.emoteID);
                 })
             })
-        })
+    });
     $embed.setDescription(`Roles last updated on  ${new Date().toString()}`);
     return;
 }
@@ -40,15 +47,13 @@ export const roleremove = (msg: Message, commandString: string[], $embed: Messag
         return;
     }
     let message = "That role can't be removed, sorry. Ask a Goon or Admin to remove it for you.";
-    Object.keys(roles.roles).forEach(category => {
-        Object.keys(roles.roles[category]).forEach(id =>{
-            if (roles.roles[category][id][1] === commandString[1]){
-                msg.guild?.member(msg.member.user.id)?.roles.remove(roles.roles[category][id][0]);
-                console.log(`Removed ${msg.member.user.username} from the ${roles.roles[category][id][1]} role`);
-                message = `Removed you from the ${commandString[1]} role.`;
-            }
-        });
-    });
+    roles.forEach(category => {
+        if(category.roles.some(r => r.name.toLowerCase() === commandString[1])){
+            msg.guild?.member(msg.member.user.id)?.roles.remove(category.roles.find(role => role.name.toLowerCase() === commandString[1]).roleID);
+            console.log(`Removed ${msg.member.user.username} from the ${commandString[1].toLowerCase()} role`);
+            message = `Removed you from the ${commandString[1].toLowerCase()} role.`;
+        }
+    })
     $embed.setDescription(message);
     return; 
 }
@@ -66,9 +71,9 @@ export const resources = ($embed: MessageEmbed) => {
     let content = "";
     channels.categories.forEach(category => {
         content="";
-        category.channels.forEach( id => {
+        category.channels.forEach(id => {
             content += `<#${id}>\n`
-        })
+        });
         $embed.addField(category.name, content);
     })
     return;
