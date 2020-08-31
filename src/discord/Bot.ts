@@ -1,9 +1,10 @@
-import { Client, Message, User } from 'discord.js'
+import { Client, Message, User, MessageEmbed } from 'discord.js'
 import * as toolkit from './toolkit.json'
 import * as roles from "./roles.json"
-import * as command from "./command-strings.json"
+import {commands} from "./command-strings.json"
 import { generateName } from './name-gen'
 import * as functions from "./functions"
+import { channels } from "../config.json"
 export default class Bot {
 	private readonly client: Client;
 	private readonly config: DiscordConfig;
@@ -26,7 +27,7 @@ export default class Bot {
 		});
 		this.client.on('messageReactionAdd', async (reaction, user) => {
 			if (user.bot) return;
-			if (reaction.message.channel.id === roles.channelID){ //Roles Channel ID
+			if (reaction.message.channel.id === channels.roles){ //Roles Channel ID
 				const memberRoles = reaction.message.guild?.member(user.id)?.roles;
 				Object.keys(roles.roles).forEach(category => {
 					Object.keys(roles.roles[category]).forEach(id =>{
@@ -40,7 +41,7 @@ export default class Bot {
 		});
 		this.client.on('messageReactionRemove', async (reaction, user) => {
 			if (user.bot) return;
-			if (reaction.message.channel.id === roles.channelID){ //Roles Channel ID
+			if (reaction.message.channel.id === channels.roles){ //Roles Channel ID
 				const memberRoles = reaction.message.guild?.member(user.id)?.roles;
 				Object.keys(roles.roles).forEach(category => {
 					Object.keys(roles.roles[category]).forEach(id =>{
@@ -54,7 +55,7 @@ export default class Bot {
 		});
 		this.client.on('guildMemberAdd', member => {
             console.log("A new member has joined");
-            member.send("Welcome to ACM Cyber's Discord! ACM Cyber is a community of all kinds of cybersecurity enthusiasts and hobbyists. In this server, we'll announce club activities and events, hold spontaneous discussions, post memes, and more! No experience is required to join ACM Cyber. To get started, read the rules in #rulesandinfo(and react to the message) and once you introduce yourself in #introductions, you'll have access to the full server! Get your roles over in #roles, and join the discussion in #lobby!")
+            member.send(`Welcome to ACM Cyber's Discord! ACM Cyber is a community of all kinds of cybersecurity enthusiasts and hobbyists. In this server, we'll announce club activities and events, hold spontaneous discussions, post memes, and more! No experience is required to participate in ACM Cyber. To get started, read the rules in <#${channels.rules}> and react to the message. Once you introduce yourself in <#${channels.introductions}>, you'll have access to the full server!`)
                 .catch(console.error);
 		});
 		return this.client.login(this.config.token);
@@ -68,13 +69,14 @@ export default class Bot {
                 return msg.reply("Pong!");
 			} else {
 				// Giving users server access once they type in the introductions channel.
-				if(msg.channel.id === roles.channelID //Message is in the introductions channel
+				if(msg.channel.id === channels.introductions //Message is in the introductions channel
 				&& msg.content.includes(' ') //Message is longer than one word
 				&& msg.member !== null // just in case it is
 				&& !(msg.member.roles.cache.has('742797850630684762'))) //ID of "member" role
                 {
                     console.log("Gave member role to " + msg.member.user.tag);
 					msg.member.roles.add('742797850630684762');
+					msg.member.send(`Great! Get some roles over in <#${channels.roles}> to connect with others who share your interests and join the discussion in <#${channels.lobby}>!`)
 				}
 				//Unlikely chance for the bot to add an eye emote
 				if (Math.random() < 0.01) {
@@ -84,29 +86,36 @@ export default class Bot {
 			}
 		} else {
 			const commandString = msg.content.substr(config.prefix.length).trim().split(' ');
-			const reply = {embed :{color: command.generic.color, title: command.generic.title, url : command.generic.url, footer: command.generic.footer, description : "", fields : []}};
+			const reply = new MessageEmbed()
+				.setColor(8388608)
+				.setTitle("NSA")
+				.setURL("http://github.com/acmucsd-cyber/nsa")
+				.setFooter("I'm Watching You 👁️");
+			
 			switch (commandString[0].toLowerCase()) {
 				case "toolkit":
 				case "tk":
-					reply.embed.fields = functions.tk(commandString);
+					functions.tk(commandString, reply);
           			break;
 				case "name":
-					reply.embed.description = `What about this name:\n **${generateName(commandString)}**`;
+					reply.setDescription(`What about this name:\n **${generateName(commandString)}**`);
 					break;
 				case "help":
 				case "gettingstarted":
 				case "faq":
+					reply.addFields(commands.find(command => command.name === commandString[0]).fields);
+					break;
 				case "resources":
-					reply.embed.fields = command[commandString[0]].fields;
+					functions.resources(reply);
 					break;
 				case "roles":
-					reply.embed.description = functions.Roles(msg);
+					functions.Roles(msg, reply);
 					break;
 				case "roleremove":
-					reply.embed.description = functions.roleremove(msg, commandString);
+					functions.roleremove(msg, commandString, reply);
 					break;		
 				default:
-					reply.embed.description = "Unknown command!";
+					reply.setDescription("Unknown command!");
 			}
 			return msg.channel.send(reply);
 		}

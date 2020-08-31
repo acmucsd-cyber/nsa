@@ -1,54 +1,80 @@
-import * as roles from "./roles.json"
-import { Message } from "discord.js"
+import {roles} from "./roles.json"
+import { Message, MessageEmbed } from "discord.js"
 import * as toolkit from './toolkit.json'
-import * as command from "./command-strings.json"
+import {commands} from "./command-strings.json"
+import {channels} from "../config.json"
 
-export const Roles = (msg: Message) => {
+export const Roles = (msg: Message, $embed: MessageEmbed) => {
     if (!(msg.member?.roles.cache.find(r => r.name === "Goon" || r.name === "Board" || r.name ==="Admin" || r.name === "Discord Bot Dev"))){
-        return "Only Goons, Admins, Board, or Bot Devs can use this command. Check out [redacted for server safety] to get roles.";
+        $embed.setDescription(`Only Goons, Admins, Board, or Bot Devs can use this command. Check out <#${channels.roles}> to get roles.`);
+        return;
     }
-    if (msg.channel.id !== roles.channelID){ //ID of the roles channel
-        return "Please only use this command in the roles channel!";
+    if (msg.channel.id !== channels.roles){ //ID of the roles channel
+        $embed.setDescription("Please only use this command in the roles channel!");
+        return;
     }
     msg.channel.bulkDelete(10, true);
-    Object.keys(roles.embeds).forEach(key => {
-        msg.channel.send({ embed: roles.embeds[key] })
-            .then((reactMessage) => {
-                Object.keys(roles.roles[key]).forEach(emote => {
-                    reactMessage.react(emote);
+    let roleCat = new MessageEmbed; 
+    roles.forEach(category => {
+        roleCat = new MessageEmbed()
+            .setColor(8388608);
+        roleCat.setTitle(category.category);
+        category.roles.forEach(role => {
+            roleCat.addField(role.name, `<:${role.name.toLowerCase().replace('-', '')}:${role.emoteID}>`);
+        });
+        msg.channel.send(roleCat)
+            .then(reactMessage => {
+                category.roles.forEach(role => {
+                    reactMessage.react(role.emoteID);
                 })
             })
-        })
-    return `Roles last updated on  ${new Date().toString()}`;
+    });
+    $embed.setDescription(`Roles last updated on  ${new Date().toString()}`);
+    return;
 }
 
-export const roleremove = (msg: Message, commandString) => {
+export const roleremove = (msg: Message, commandString: string[], $embed: MessageEmbed) => {
     if (commandString.length !== 2){
-        return "Usage: ```-roleremove [role]```";
+        $embed.setDescription("Usage: ```-roleremove [role]```");
+        return;
     }
     if (msg.member === null) {
-        return "Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM."
+        $embed.setDescription("Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM.");
+        return;
     }
     if(!msg.member.roles.cache.find(r => r.name.toLowerCase() === commandString[1])){
-        return "You don't have that role.";
+        $embed.setDescription("You don't have that role.");
+        return;
     }
     let message = "That role can't be removed, sorry. Ask a Goon or Admin to remove it for you.";
-    Object.keys(roles.roles).forEach(category => {
-        Object.keys(roles.roles[category]).forEach(id =>{
-            if (roles.roles[category][id][1] === commandString[1]){
-                msg.guild?.member(msg.member.user.id)?.roles.remove(roles.roles[category][id][0]);
-                console.log(`Removed ${msg.member.user.username} from the ${roles.roles[category][id][1]} role`);
-                message = `Removed you from the ${commandString[1]} role.`;
-            }
-        })
-    });
-    return message; 
+    roles.forEach(category => {
+        if(category.roles.some(r => r.name.toLowerCase() === commandString[1])){
+            msg.guild?.member(msg.member.user.id)?.roles.remove(category.roles.find(role => role.name.toLowerCase() === commandString[1]).roleID);
+            console.log(`Removed ${msg.member.user.username} from the ${commandString[1].toLowerCase()} role`);
+            message = `Removed you from the ${commandString[1].toLowerCase()} role.`;
+        }
+    })
+    $embed.setDescription(message);
+    return; 
 }
 
-export const tk = (commandString) => {
+export const tk = (commandString: string[], $embed: MessageEmbed) => {
     if (Object.keys(toolkit).includes(commandString[1])) {
-        return toolkit[commandString[1]].fields;
+        $embed.addFields(toolkit[commandString[1]].fields);
     } else {
-        return command.toolkit.fields;
+        $embed.addFields(commands.find(command => command.name === "toolkit").fields);
     }
+    return;
+}
+
+export const resources = ($embed: MessageEmbed) => {
+    let content = "";
+    channels.categories.forEach(category => {
+        content="";
+        category.channels.forEach(id => {
+            content += `<#${id}>\n`
+        });
+        $embed.addField(category.name, content);
+    })
+    return;
 }
