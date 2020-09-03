@@ -60,7 +60,8 @@ export default class Bot {
         .setTitle('NSA')
         .setURL('http://github.com/acmucsd-cyber/nsa')
         .setFooter("I'm Watching You 👁️");
-      switch (commandString[0].toLowerCase()) {
+      const cmdProg = commandString[0].toLowerCase();
+      switch (cmdProg) {
         case 'toolkit':
         case 'tk':
           functions.tk(commandString, reply);
@@ -71,7 +72,7 @@ export default class Bot {
         case 'help':
         case 'gettingstarted':
         case 'faq':
-          reply.addFields(commands.find((command) => command.name === commandString[0]).fields);
+          reply.addFields(commands.find((command) => command.name === cmdProg).fields);
           break;
         case 'resources':
           functions.resources(reply);
