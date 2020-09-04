@@ -31,7 +31,7 @@ export default class Bot {
   public listen() {
     this.client.on('guildMemberAdd', (member) => {
       console.log('A new member has joined');
-      member.send(`Welcome to ACM Cyber's Discord! ACM Cyber is a community of all kinds of cybersecurity enthusiasts and hobbyists. In this server, we'll announce club activities and events, hold spontaneous discussions, post memes, and more! No experience is required to participate in ACM Cyber. To get started, read the rules in <#${channels.rules}> and react to the message. Once you introduce yourself in <#${channels.introductions}>, you'll have access to the full server!`)
+      member.send(`Welcome to ACM Cyber! We’re excited to have you with us during our first year as a student organization.\n Our three pillars (Learn, Practice, and Participate) drive our decisions as a club and the events we hold. As you know, we host technical events to introduce our members to various concepts in cybersecurity and industry panels to form connections with the greater computing community. We are always open for feedback for workshops and any ideas for events we can hold! If you have an idea about an event you’d like to see come to fruition, pitch it in the Ideas channel! This channel is for you to voice your opinion about anything you would like to see! Whether you would like to teach a workshop yourself or have us hold a workshop on this topic, please let us know through this channel! \n **First, however, please read the rules in <#${channels.rules}> and introduce yourself in <#${channels.introductions}> to gain access to the rest of the server.**`)
         .catch(console.error);
     });
 
@@ -60,8 +60,7 @@ export default class Bot {
         .setTitle('NSA')
         .setURL('http://github.com/acmucsd-cyber/nsa')
         .setFooter("I'm Watching You 👁️");
-      const cmdProg = commandString[0].toLowerCase();
-      switch (cmdProg) {
+      switch (commandString[0].toLowerCase()) {
         case 'toolkit':
         case 'tk':
           functions.tk(commandString, reply);
@@ -72,7 +71,7 @@ export default class Bot {
         case 'help':
         case 'gettingstarted':
         case 'faq':
-          reply.addFields(commands.find((command) => command.name === cmdProg).fields);
+          reply.addFields(commands.find((command) => command.name === commandString[0].toLowerCase()).fields);
           break;
         case 'resources':
           functions.resources(reply);
