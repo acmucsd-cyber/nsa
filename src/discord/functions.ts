@@ -20,7 +20,7 @@ export const Roles = (message: Message, $embed: MessageEmbed) => {
       .setColor(8388608);
     roleCat.setTitle(category.category);
     category.roles.forEach((role) => {
-      roleCat.addField(role.name, `<:${role.name.toLowerCase().replace('-', '')}:${role.emoteID}>`);
+      roleCat.addField(role.name, `<:${role.name.toLowerCase().replace(/[^a-z]/g, '')}:${role.emoteID}>`);
     });
     message.channel.send(roleCat)
       .then((reactMessage) => {
