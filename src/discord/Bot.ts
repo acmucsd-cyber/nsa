@@ -13,9 +13,9 @@ export default class Bot {
 
   private readonly config: DiscordConfig;
 
-  private readonly ctf: CTF;
+  public readonly ctf: CTF;
 
-  private checkingFlag = new Set<User>();
+  public checkingFlag = new Set<User>();
 
   constructor(config: DiscordConfig) {
     this.client = new Client();
@@ -49,68 +49,6 @@ export default class Bot {
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
   }
-
-  processCTFCommand = (commandArgs: string[], invoker: User, msgReply: (msg: string) => void): string => { // TODO make submitting flags DM only
-    // let badUsage = false;
-    let error = '';
-    const template = `Usage: ${this.config.prefix}ctf`;
-    const flagHelp = `${template} flag CHALLENGE_NAME FLAG`;
-    if (commandArgs.length === 0) {
-      error = 'Error: No command specified\n';
-    } else {
-      switch (commandArgs[0]) {
-        case 'flag': {
-          let cmdError = '';
-          if (commandArgs.length === 3) {
-            const chalName = commandArgs[1];
-            if (this.ctf.validateChallengeName(chalName)) {
-              if (this.checkingFlag.has(invoker)) {
-                return 'Please wait for your last flag submission to be processed first.';
-              }
-              setTimeout(() => {
-                this.checkingFlag.delete(invoker);
-                let reply: string;
-                const correct = this.ctf.checkFlag(chalName, commandArgs[2]);
-                if (correct) {
-                  reply = `Congratulations! 🎉 You captured the flag for ${chalName}.`;
-                  console.log(`User ${invoker.username} captured the flag for ${chalName}!`);
-                  // TODO record this capture by this user.
-                } else {
-                  reply = `Sorry, your flag for ${chalName} is incorrect.`;
-                }
-                msgReply(reply);
-              }, 1000 + Math.random() * 2000); // TODO if it fails (with an exception) automatically delete invoker from this.checkingFlag to avoid deadlocks
-              // timeout range from 1 to 3 seconds
-              this.checkingFlag.add(invoker);
-              return `Checking flag for ${chalName}...`;
-            }
-            cmdError = `Error: ${chalName} is not a challenge name.\n`;// TODO: give a list of valid challenge names
-          } else {
-            cmdError = 'Error: You must specify both the challenge name and the flag you want to submit\n';
-          }
-          return cmdError + flagHelp;
-        }
-        // TODO: a command to read challenge description
-        case 'help':
-          if (commandArgs.length === 2) {
-            switch (commandArgs[1]) {
-              case 'flag':
-                return flagHelp;
-              case 'help':
-                break;
-              default:
-                error = `Error: ${commandArgs[1]} is not a command\n`;
-            }
-          }/*  else {
-            error = "Error: please specify a command to get help on";
-          } */
-          break;
-        default:
-          error = `Error: ${commandArgs[0]} is not a command\n`;
-      }
-    }
-    return `${error}${template} COMMAND\n\nwhere COMMAND is one of the following:\nflag: submit and check CTF flag\nhelp COMMAND: get help on a specific command`;
-  };
 
   getReplyTempate = () => new MessageEmbed()
     .setColor(8388608)
@@ -161,7 +99,7 @@ export default class Bot {
           functions.roleremove(message, commandString, reply);
           break;
         case 'ctf':
-          reply.setDescription(this.processCTFCommand(commandString.slice(1), message.author, (ctfReplyMsg) => {
+          reply.setDescription(functions.processCTFCommand(this, commandString.slice(1), message.author, (ctfReplyMsg) => {
             const ctfReply = this.getReplyTempate();
             ctfReply.setDescription(ctfReplyMsg);
             message.channel.send(ctfReply).then(() => {
