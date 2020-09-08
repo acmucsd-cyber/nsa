@@ -50,26 +50,27 @@ export default class Bot {
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
   }
 
-  processCTFCommand = (commandArgs: string[], invoker: User, msgReply: (msg: string) => void): string => {
+  processCTFCommand = (commandArgs: string[], invoker: User, msgReply: (msg: string) => void): string => { // TODO make submitting flags DM only
     // let badUsage = false;
-    let error = "";
-    let template = `Usage: ${this.config.prefix}ctf`;
-    let flagHelp = `${template} flag CHALLENGE_NAME FLAG`;
-    if (commandArgs.length == 0) {
-      error = "Error: No command specified\n";
+    let error = '';
+    const template = `Usage: ${this.config.prefix}ctf`;
+    const flagHelp = `${template} flag CHALLENGE_NAME FLAG`;
+    if (commandArgs.length === 0) {
+      error = 'Error: No command specified\n';
     } else {
       switch (commandArgs[0]) {
-        case "flag":
-          let cmdError = "";
-          if (commandArgs.length == 3) {
-            let chalName = commandArgs[1];
+        case 'flag': {
+          let cmdError = '';
+          if (commandArgs.length === 3) {
+            const chalName = commandArgs[1];
             if (this.ctf.validateChallengeName(chalName)) {
               if (this.checkingFlag.has(invoker)) {
-                return `Please wait for your last flag submission to be processed first.`;
+                return 'Please wait for your last flag submission to be processed first.';
               }
               setTimeout(() => {
                 this.checkingFlag.delete(invoker);
-                let reply: string, correct = this.ctf.checkFlag(chalName, commandArgs[2]);
+                let reply: string;
+                const correct = this.ctf.checkFlag(chalName, commandArgs[2]);
                 if (correct) {
                   reply = `Congratulations! 🎉 You captured the flag for ${chalName}.`;
                   console.log(`User ${invoker.username} captured the flag for ${chalName}!`);
@@ -82,21 +83,20 @@ export default class Bot {
               // timeout range from 1 to 3 seconds
               this.checkingFlag.add(invoker);
               return `Checking flag for ${chalName}...`;
-            } else {
-              cmdError = `Error: ${chalName} is not a challenge name.\n`;
-              // TODO: give a list of valid challenge names
             }
+            cmdError = `Error: ${chalName} is not a challenge name.\n`;// TODO: give a list of valid challenge names
           } else {
-            cmdError = "Error: You must specify both the challenge name and the flag you want to submit";
+            cmdError = 'Error: You must specify both the challenge name and the flag you want to submit\n';
           }
           return cmdError + flagHelp;
+        }
         // TODO: a command to read challenge description
-        case "help":
-          if (commandArgs.length == 2) {
+        case 'help':
+          if (commandArgs.length === 2) {
             switch (commandArgs[1]) {
-              case "flag":
+              case 'flag':
                 return flagHelp;
-              case "help":
+              case 'help':
                 break;
               default:
                 error = `Error: ${commandArgs[1]} is not a command\n`;
@@ -110,15 +110,13 @@ export default class Bot {
       }
     }
     return `${error}${template} COMMAND\n\nwhere COMMAND is one of the following:\nflag: submit and check CTF flag\nhelp COMMAND: get help on a specific command`;
-  }
+  };
 
-  getReplyTempate = (): MessageEmbed => {
-    return new MessageEmbed()
-      .setColor(8388608)
-      .setTitle('NSA')
-      .setURL('http://github.com/acmucsd-cyber/nsa')
-      .setFooter("I'm Watching You 👁️");
-  }
+  getReplyTempate = () => new MessageEmbed()
+    .setColor(8388608)
+    .setTitle('NSA')
+    .setURL('http://github.com/acmucsd-cyber/nsa')
+    .setFooter("I'm Watching You 👁️");
 
   messageHandle = (message: Message) => {
     if (message.author.bot) return;
@@ -162,9 +160,9 @@ export default class Bot {
         case 'roleremove':
           functions.roleremove(message, commandString, reply);
           break;
-        case "ctf":
+        case 'ctf':
           reply.setDescription(this.processCTFCommand(commandString.slice(1), message.author, (ctfReplyMsg) => {
-            let ctfReply = this.getReplyTempate();
+            const ctfReply = this.getReplyTempate();
             ctfReply.setDescription(ctfReplyMsg);
             message.channel.send(ctfReply).then(() => {
               console.log('Sent flag submission response');
