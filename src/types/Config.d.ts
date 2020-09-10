@@ -1,17 +1,17 @@
 declare interface Config {
   discord: DiscordConfig,
-  channels: Channels
+  challenges: Challenge[],
+  channels: Channels,
 }
 
 declare interface DiscordConfig {
-  token: string,      // your discord bot token, used to authenticate
-  prefix: string,     // the prefix this bot will look for before each command
-  flags: Flags        // where mini-CTF flags will be stored 
+  token: string, // your discord bot token, used to authenticate
+  prefix: string, // the prefix this bot will look for before each command
 }
 
-declare interface Flags { // format: "flags": {"challenge_name": "nsa{l33t-str1ng}", ...}
-    example_challenge: string,
-    challenge_2: string
+declare interface Challenge { // format: "flags": {"challenge_name": "nsa{l33t-str1ng}", ...}
+  name: string,
+  flag: string
 }
 
 declare interface Channels {
@@ -22,7 +22,7 @@ declare interface Channels {
   categories: Category[] // An array of categories you wish to be displayed in the resources command
 }
 
-declare interface Category{
+declare interface Category {
   name: string, // The name for the category of channels
   channels: string[] // An array of all of the IDs of channels (of the desired category) you wish to include in the message
 }

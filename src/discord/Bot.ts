@@ -5,22 +5,25 @@ import roles from './roles';
 import commands from './command-strings';
 import { generateName } from './name-gen';
 import * as functions from './functions';
-import { channels } from '../config.json';
-import { CTF } from './ctf';
+import { channels, challenges } from '../config.json';
 
 export default class Bot {
   private readonly client: Client;
 
   private readonly config: DiscordConfig;
 
-  public readonly ctf: CTF;
+  public checkingFlag: Set<User>;
 
-  public checkingFlag = new Set<User>();
+  private flags: Map<string, Buffer>;
 
   constructor(config: DiscordConfig) {
     this.client = new Client();
     this.config = config;
-    this.ctf = new CTF(config.flags);
+    this.checkingFlag = new Set<User>();
+    this.flags = new Map<string, Buffer>();
+    challenges.forEach((challenge: Challenge) => {
+      this.flags.set(challenge.name, Buffer.from(challenge.flag));
+    });
   }
 
   public async connect() {
@@ -50,11 +53,7 @@ export default class Bot {
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
   }
 
-  getReplyTempate = () => new MessageEmbed()
-    .setColor(8388608)
-    .setTitle('NSA')
-    .setURL('http://github.com/acmucsd-cyber/nsa')
-    .setFooter("I'm Watching You 👁️");
+  getFlag = (challengeName: string) => this.flags.get(challengeName);
 
   messageHandle = (message: Message) => {
     if (message.author.bot) return;
@@ -75,7 +74,8 @@ export default class Bot {
       }
     } else {
       const commandString = message.content.substr(this.config.prefix.length).trim().split(' ');
-      const reply = this.getReplyTempate();
+      const reply = new MessageEmbed();
+      functions.formatEmbed(reply);
       switch (commandString[0].toLowerCase()) {
         case 'toolkit':
         case 'tk':
@@ -98,14 +98,16 @@ export default class Bot {
         case 'roleremove':
           functions.roleremove(message, commandString, reply);
           break;
-        case 'ctf':
-          reply.setDescription(functions.processCTFCommand(this, commandString.slice(1), message.author, (ctfReplyMsg) => {
-            const ctfReply = this.getReplyTempate();
-            ctfReply.setDescription(ctfReplyMsg);
-            message.channel.send(ctfReply).then(() => {
-              console.log('Sent flag submission response');
-            }).catch(() => { });
-          }));
+        case 'flag':
+          if (commandString.length === 1) {
+            reply.addFields(commands.find((command) => command.name === 'flag').fields);
+            break;
+          }
+          if (!this.flags.has(commandString[1].toLowerCase())) {
+            reply.setDescription('Error: Invalid challenge');
+            break;
+          }
+          functions.flag(this.checkingFlag, this.getFlag(commandString[1].toLowerCase()), commandString, message, reply);
           break;
         default:
           reply.setDescription('Unknown command!');

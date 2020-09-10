@@ -20,9 +20,9 @@ export function generateName(commandArgs: string[]): string {
     string: ['separator'],
   });
   // let remaindingArgs: [] = args._
-    // if (remaindingArgs.length != 0) {
-    //     console.log(`Unrecognized arguments: ${remaindingArgs.join(' ')}`) // TODO throw exception in this case
-    // }
+  // if (remaindingArgs.length != 0) {
+  //     console.log(`Unrecognized arguments: ${remaindingArgs.join(' ')}`) // TODO throw exception in this case
+  // }
   const name: string[] = adjNoun();
   if (args.leet) {
     for (let i = 0; i < name.length; i++) {

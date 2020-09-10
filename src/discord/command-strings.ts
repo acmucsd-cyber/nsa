@@ -13,6 +13,19 @@ export default [
     ],
   },
   {
+    name: 'flag',
+    fields: [
+      {
+        name: 'Usage:',
+        value: '```-flag [flag] [challenge name]```',
+      },
+      {
+        name: 'Description:',
+        value: '```Used to submit and check CTF flags```',
+      },
+    ],
+  },
+  {
     name: 'roleremove',
     fields: [
       {
@@ -30,7 +43,7 @@ export default [
     fields: [
       {
         name: 'User Commands:',
-        value: '```\n-help\n-resources \n-FAQ\n-GettingStarted\n-toolkit or -tk\n-roleremove\n```',
+        value: '```\n-help\n-resources \n-FAQ\n-GettingStarted\n-toolkit or -tk\n-roleremove\n-flag```',
       },
       {
         name: 'Goon / Admin Commands:',
