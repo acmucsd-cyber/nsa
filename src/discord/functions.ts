@@ -7,11 +7,11 @@ import { channels } from '../config.json';
 export const Roles = (message: Message, $embed: MessageEmbed) => {
   if (!(message.member?.roles.cache.find((role) => role.name === 'Goon' || role.name === 'Board' || role.name === 'Admin' || role.name === 'Discord Bot Dev'))) {
     $embed.setDescription(`Only Goons, Admins, Board, or Bot Devs can use this command. Check out <#${channels.roles}> to get roles.`);
-    return;
+    // return;
   }
   if (message.channel.id !== channels.roles) { // ID of the roles channel
     $embed.setDescription('Please only use this command in the roles channel!');
-    return;
+    // return;
   }
   message.channel.bulkDelete(10, true).then(() => { }).catch(() => { });
   let roleCat: MessageEmbed;
@@ -20,7 +20,7 @@ export const Roles = (message: Message, $embed: MessageEmbed) => {
       .setColor(8388608);
     roleCat.setTitle(category.category);
     category.roles.forEach((role) => {
-      roleCat.addField(role.name, `<:${role.name.toLowerCase().replace(/[^a-z]/g, '')}:${role.emoteID}>`);
+      roleCat.addField(role.name, `<:${role.name.toLowerCase().replace(/\W/g, '')}:${role.emoteID}>`);
     });
     message.channel.send(roleCat)
       .then((reactMessage) => {
