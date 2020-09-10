@@ -17,7 +17,7 @@ export default [
     fields: [
       {
         name: 'Usage:',
-        value: '```-flag [flag] [challenge name]```',
+        value: '```-flag [challenge name] [flag]```',
       },
       {
         name: 'Description:',
