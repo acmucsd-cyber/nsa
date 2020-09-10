@@ -104,7 +104,7 @@ export default class Bot {
             break;
           }
           if (!this.flags.has(commandString[1].toLowerCase())) {
-            reply.setDescription('Error: Invalid challenge');
+            reply.setDescription(`Error: Can't find challenge ${commandString[1]}. Make sure the spelling is correct.`);
             break;
           }
           functions.flag(this.checkingFlag, this.getFlag(commandString[1].toLowerCase()), commandString, message, reply);

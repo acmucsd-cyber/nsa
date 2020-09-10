@@ -4,7 +4,7 @@ import { timingSafeEqual } from 'crypto';
 import roles from './roles';
 import toolkit from './toolkit';
 import commands from './command-strings';
-import { channels, challenges } from '../config.json';
+import { channels } from '../config.json';
 
 export const formatEmbed = ($embed: MessageEmbed) => {
   $embed
@@ -48,30 +48,26 @@ export const flag = (flagUsers: Set<User>, realFlag: Buffer, commandArgs: string
     $embed.setDescription('Please make sure to include both a flag **and** a challenge');
     return;
   }
-  if (challenges.some((challenge: Challenge) => challenge.name === commandArgs[1].toLowerCase())) {
-    if (flagUsers.has(message.author)) {
-      $embed.setDescription('Please wait for your last flag submission to be processed first.');
-      return;
-    }
-    setTimeout(() => {
-      flagUsers.delete(message.author);
-      const msg = new MessageEmbed();
-      formatEmbed(msg);
-      if (Buffer.from(commandArgs[2]).length === realFlag.length && timingSafeEqual(Buffer.from(commandArgs[2]), realFlag)) {
-        msg.setDescription(`Congratulations! 🎉 You captured the flag for ${commandArgs[1]}.`);
-        message.channel.send(msg).then(() => { }).catch(() => { });
-        console.log(`User ${message.author.username} captured the flag for ${commandArgs[1]}!`);
-        // TODO record this capture by this user.
-      } else {
-        msg.setDescription(`Sorry, your flag for ${commandArgs[1]} is incorrect.`);
-        message.channel.send(msg).then(() => { }).catch(() => { });
-      }
-    }, 1000 + Math.random() * 2000);
-    flagUsers.add(message.author);
-    $embed.setDescription('Please wait while your flag is checked...');
-  } else {
-    $embed.setDescription('Error: Invalid challenge name');
+  if (flagUsers.has(message.author)) {
+    $embed.setDescription('Please wait for your last flag submission to be processed first.');
+    return;
   }
+  setTimeout(() => {
+    flagUsers.delete(message.author);
+    const msg = new MessageEmbed();
+    formatEmbed(msg);
+    if (Buffer.from(commandArgs[2]).length === realFlag.length && timingSafeEqual(Buffer.from(commandArgs[2]), realFlag)) {
+      msg.setDescription(`Congratulations! 🎉 You captured the flag for ${commandArgs[1]}.`);
+      message.channel.send(msg).then(() => { }).catch(() => { });
+      console.log(`User ${message.author.username} captured the flag for ${commandArgs[1]}!`);
+      // TODO record this capture by this user.
+    } else {
+      msg.setDescription(`Sorry, your flag for ${commandArgs[1]} is incorrect.`);
+      message.channel.send(msg).then(() => { }).catch(() => { });
+    }
+  }, 1000 + Math.random() * 2000);
+  flagUsers.add(message.author);
+  $embed.setDescription('Please wait while your flag is checked...');
 };
 
 export const roleremove = (message: Message, commandString: string[], $embed: MessageEmbed) => {
