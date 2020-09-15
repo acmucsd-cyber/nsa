@@ -21,7 +21,7 @@ export default [
       },
       {
         name: 'Description:',
-        value: '```Used to submit and check CTF flags```',
+        value: '```Used to submit and check CTF flags\nNote: For flag security, you can only use this command in private messages to the bot.```',
       },
     ],
   },

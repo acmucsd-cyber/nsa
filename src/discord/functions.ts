@@ -60,7 +60,7 @@ export const flag = (flagUsers: Set<User>, realFlag: Buffer, commandArgs: string
       msg.setDescription(`Congratulations! 🎉 You captured the flag for ${commandArgs[1]}.`);
       message.channel.send(msg).then(() => { }).catch(() => { });
       console.log(`User ${message.author.username} captured the flag for ${commandArgs[1]}!`);
-      // TODO record this capture by this user.
+      // TODO record this capture by this user. Store flag captures in some sort of database
     } else {
       msg.setDescription(`Sorry, your flag for ${commandArgs[1]} is incorrect.`);
       message.channel.send(msg).then(() => { }).catch(() => { });

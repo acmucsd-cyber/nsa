@@ -55,6 +55,37 @@ export default class Bot {
 
   getFlag = (challengeName: string) => this.flags.get(challengeName);
 
+  redactFlagSubmission = (message: Message) => {
+    const deleteReason = `Your \`-flag\` command in ${message.channel.toString()} was deleted for flag security purposes.`;
+    message.delete({ reason: deleteReason })
+      .then(() => {
+        console.log(`Deleted -flag command from ${message.member?.user.tag} in channel ID ${message.channel.id}.`);
+        const reply = new MessageEmbed();
+        functions.formatEmbed(reply);
+        reply.setDescription(`${deleteReason}
+Don't worry, this is _not_ an automatic ban on your participation in mini-CTFs.
+**Full Command**
+> ${message.content}
+
+Remember you can only submit flags here in DM.`);
+        // message.channel.send(reply)
+        message.member?.user.createDM().then((dmChannel) => {
+          dmChannel.send(reply)
+            .then(() => { })
+            .catch(() => {
+              console.log(`Oh no, there was an issue messaging ${message.member?.user.tag} on flag deletion.`);
+            });
+        }).catch((reason) => {
+          console.log(`Oh no, there was an issue creating DM channel with ${message.member?.user.tag}.`);
+          console.log(reason);
+        });
+      })
+      .catch((reason) => {
+        console.log(`Oh no, there was an issue deleting message from ${message.member?.user.tag} containing a possible flag.`);
+        console.log(reason);
+      });
+  };
+
   messageHandle = (message: Message) => {
     if (message.author.bot) return;
     if (!message.content.startsWith(this.config.prefix)) {
@@ -74,6 +105,7 @@ export default class Bot {
       }
     } else {
       const commandString = message.content.substr(this.config.prefix.length).trim().split(' ');
+      let noReply = false;
       const reply = new MessageEmbed();
       functions.formatEmbed(reply);
       switch (commandString[0].toLowerCase()) {
@@ -99,6 +131,11 @@ export default class Bot {
           functions.roleremove(message, commandString, reply);
           break;
         case 'flag':
+          if (message.guild !== null) {
+            this.redactFlagSubmission(message);
+            noReply = true; // Avoid embarrassing the user with a reply saying that the message is deleted.
+            break;
+          }
           if (commandString.length === 1) {
             reply.addFields(commands.find((command) => command.name === 'flag').fields);
             break;
@@ -113,9 +150,13 @@ export default class Bot {
           reply.setDescription('Unknown command!');
       }
 
-      message.channel.send(reply).then(() => {
-        console.log('Response sent');
-      }).catch(() => { });
+      if (noReply) {
+        console.log('No reply for this message.');
+      } else {
+        message.channel.send(reply).then(() => {
+          console.log('Response sent');
+        }).catch(() => { });
+      }
     }
   };
 
