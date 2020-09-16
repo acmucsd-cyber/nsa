@@ -55,35 +55,21 @@ export default class Bot {
 
   getFlag = (challengeName: string) => this.flags.get(challengeName);
 
-  redactFlagSubmission = (message: Message) => {
+  redactFlagSubmission = async (message: Message) => {
     const deleteReason = `Your \`-flag\` command in ${message.channel.toString()} was deleted for flag security purposes.`;
-    message.delete({ reason: deleteReason })
-      .then(() => {
-        console.log(`Deleted -flag command from ${message.member?.user.tag} in channel ID ${message.channel.id}.`);
-        const reply = new MessageEmbed();
-        functions.formatEmbed(reply);
-        reply.setDescription(`${deleteReason}
+    await message.delete({ reason: deleteReason });
+    console.log(`Deleted -flag command from ${message.member?.user.tag} in channel ID ${message.channel.id}.`);
+    const reply = new MessageEmbed();
+    functions.formatEmbed(reply);
+    reply.setDescription(`${deleteReason}
 Don't worry, this is _not_ an automatic ban on your participation in mini-CTFs.
 **Full Command**
 > ${message.content}
 
 Remember you can only submit flags here in DM.`);
-        // message.channel.send(reply)
-        message.member?.user.createDM().then((dmChannel) => {
-          dmChannel.send(reply)
-            .then(() => { })
-            .catch(() => {
-              console.log(`Oh no, there was an issue messaging ${message.member?.user.tag} on flag deletion.`);
-            });
-        }).catch((reason) => {
-          console.log(`Oh no, there was an issue creating DM channel with ${message.member?.user.tag}.`);
-          console.log(reason);
-        });
-      })
-      .catch((reason) => {
-        console.log(`Oh no, there was an issue deleting message from ${message.member?.user.tag} containing a possible flag.`);
-        console.log(reason);
-      });
+    const dmChannel = await message.member?.user.createDM();
+    await dmChannel.send(reply);
+    console.log(`Sent DM to ${message.member?.user.tag} notifying -flag command deletion.`);
   };
 
   messageHandle = (message: Message) => {
@@ -132,7 +118,10 @@ Remember you can only submit flags here in DM.`);
           break;
         case 'flag':
           if (message.guild !== null) {
-            this.redactFlagSubmission(message);
+            this.redactFlagSubmission(message).then(() => {}).catch((error) => {
+              console.log(`Oh no, there was an issue deleting a possible flag submission from user ${message.member?.user.tag} in channel ID ${message.channel.id}:`);
+              console.log(error);
+            });
             noReply = true; // Avoid embarrassing the user with a reply saying that the message is deleted.
             break;
           }
