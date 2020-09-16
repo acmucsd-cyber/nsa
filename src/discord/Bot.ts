@@ -1,6 +1,8 @@
 import {
   Client, Message, MessageEmbed, MessageReaction, User,
 } from 'discord.js';
+import sqlite3 from 'sqlite3';
+import { Database } from 'sqlite';
 import roles from './roles';
 import commands from './command-strings';
 import { generateName } from './name-gen';
@@ -12,13 +14,16 @@ export default class Bot {
 
   private readonly config: DiscordConfig;
 
+  private readonly db: Database<sqlite3.Database, sqlite3.Statement>;
+
   public checkingFlag: Set<User>;
 
   private flags: Map<string, Buffer>;
 
-  constructor(config: DiscordConfig) {
+  constructor(config: DiscordConfig, db: Database<sqlite3.Database, sqlite3.Statement>) {
     this.client = new Client();
     this.config = config;
+    this.db = db;
     this.checkingFlag = new Set<User>();
     this.flags = new Map<string, Buffer>();
     challenges.forEach((challenge: Challenge) => {

@@ -153,3 +153,4 @@ fabric.properties
 # NSA Specific exclusions
 dist/
 src/config.json
+nsa.db
