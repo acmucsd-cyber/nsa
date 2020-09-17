@@ -7,7 +7,7 @@ import Bot from './discord/Bot';
 const initDatabase = async (db: Database<sqlite3.Database, sqlite3.Statement>) => {
   console.log('Database is empty, initializing database for the first time...');
   // CTF solve table for Discord Bot's mini CTF
-  await db.exec('CREATE TABLE ctf_solves (userId TEXT, challenge_name TEXT, solve_time TEXT);');
+  await db.exec('CREATE TABLE ctf_solves (user_id TEXT, challenge_name TEXT, solve_time TEXT);');
   console.log('Database initialization completed.');
 };
 
