@@ -1,6 +1,5 @@
 import {
-  Channel,
-  Client, Message, MessageEmbed, MessageReaction, TextChannel, User,
+  Client, Message, MessageEmbed, MessageReaction, User,
 } from 'discord.js';
 import roles from './roles';
 import commands from './command-strings';
@@ -39,7 +38,9 @@ export default class Bot {
         });
     });
 
-    this.client.on('message', this.messageHandle);
+    this.client.on('message', (message) => {
+      this.messageHandle(message).then(() => { }).catch(console.error);
+    });
 
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
@@ -96,8 +97,8 @@ export default class Bot {
       try {
         await message.channel.send(reply);
         console.log('Response sent');
-      } catch {
-        console.error();
+      } catch (error) {
+        console.error(error);
       }
     }
   };
