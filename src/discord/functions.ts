@@ -1,5 +1,7 @@
-import { User, Message, MessageEmbed } from 'discord.js';
 import { timingSafeEqual } from 'crypto';
+import { User, Message, MessageEmbed } from 'discord.js';
+import { Database } from 'sqlite';
+import sqlite3 from 'sqlite3';
 // import Bot from './Bot';
 import roles from './roles';
 import toolkit from './toolkit';
@@ -43,7 +45,7 @@ export const Roles = (message: Message, $embed: MessageEmbed) => {
   $embed.setDescription(`Roles last updated on  ${new Date().toString()}`);
 };
 
-export const flag = (flagUsers: Set<User>, realFlag: Buffer, commandArgs: string[], message: Message, $embed: MessageEmbed) => {
+export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, flagUsers: Set<User>, realFlag: Buffer, commandArgs: string[], message: Message, $embed: MessageEmbed) => {
   if (commandArgs.length === 2) {
     $embed.setDescription('Please make sure to include both a flag **and** a challenge');
     return;
@@ -52,20 +54,30 @@ export const flag = (flagUsers: Set<User>, realFlag: Buffer, commandArgs: string
     $embed.setDescription('Please wait for your last flag submission to be processed first.');
     return;
   }
-  setTimeout(() => {
-    flagUsers.delete(message.author);
+  if (await db.get('SELECT * from ctf_solves WHERE user_id = ? and challenge_name = ?',
+    [message.author.id, commandArgs[1]]) !== undefined) {
+    $embed.setDescription('You already solved this challenge.');
+    return;
+  }
+  const checkFlags = async () => {
     const msg = new MessageEmbed();
     formatEmbed(msg);
     if (Buffer.from(commandArgs[2]).length === realFlag.length && timingSafeEqual(Buffer.from(commandArgs[2]), realFlag)) {
+      console.log(`User ${message.author.tag} captured the flag for ${commandArgs[1]}.`);
+      await db.run('INSERT INTO ctf_solves VALUES (?, ?, strftime("%Y-%m-%d %H:%M:%f", "now"));',
+        [message.author.id, commandArgs[1]]);
       msg.setDescription(`Congratulations! 🎉 You captured the flag for ${commandArgs[1]}.`);
-      message.channel.send(msg).then(() => { }).catch(() => { });
-      console.log(`User ${message.author.username} captured the flag for ${commandArgs[1]}!`);
-      // TODO record this capture by this user. Store flag captures in some sort of database
     } else {
       msg.setDescription(`Sorry, your flag for ${commandArgs[1]} is incorrect.`);
-      message.channel.send(msg).then(() => { }).catch(() => { });
     }
-  }, 1000 + Math.random() * 2000);
+    await message.channel.send(msg);
+  };
+  setTimeout(() => {
+    checkFlags().then(() => {}).catch((error) => {
+      console.error(`Failed to check flag for user ${message.author.tag}`);
+      console.error(error);
+    }).finally(() => { flagUsers.delete(message.author); });
+  }, 1500);
   flagUsers.add(message.author);
   $embed.setDescription('Please wait while your flag is checked...');
 };

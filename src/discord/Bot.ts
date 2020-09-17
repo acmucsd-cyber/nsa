@@ -52,7 +52,7 @@ export default class Bot {
         });
     });
 
-    this.client.on('message', this.messageHandle);
+    this.client.on('message', (message) => { this.messageHandle(message).then(() => {}).catch(console.error); });
 
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
@@ -77,7 +77,7 @@ Remember you can only submit flags here in DM.`);
     console.log(`Sent DM to ${message.member?.user.tag} notifying -flag command deletion.`);
   };
 
-  messageHandle = (message: Message) => {
+  messageHandle = async (message: Message) => {
     if (message.author.bot) return;
     if (!message.content.startsWith(this.config.prefix)) {
       if (message.channel.id === channels.introductions // Message is in the introductions channel
@@ -138,7 +138,7 @@ Remember you can only submit flags here in DM.`);
             reply.setDescription(`Error: Can't find challenge ${commandString[1]}. Make sure the spelling is correct.`);
             break;
           }
-          functions.flag(this.checkingFlag, this.getFlag(commandString[1].toLowerCase()), commandString, message, reply);
+          await functions.flag(this.db, this.checkingFlag, this.getFlag(commandString[1].toLowerCase()), commandString, message, reply);
           break;
         default:
           reply.setDescription('Unknown command!');
@@ -147,9 +147,11 @@ Remember you can only submit flags here in DM.`);
       if (noReply) {
         console.log('No reply for this message.');
       } else {
-        message.channel.send(reply).then(() => {
-          console.log('Response sent');
-        }).catch(() => { });
+        // message.channel.send(reply).then(() => {
+        //   console.log('Response sent');
+        // }).catch(() => { });
+        await message.channel.send(reply);
+        console.log('Response sent');
       }
     }
   };
