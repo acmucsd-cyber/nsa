@@ -1,5 +1,6 @@
 import {
-  Client, Message, MessageEmbed, MessageReaction, User,
+  Channel,
+  Client, Message, MessageEmbed, MessageReaction, TextChannel, User,
 } from 'discord.js';
 import roles from './roles';
 import commands from './command-strings';
@@ -42,24 +43,28 @@ export default class Bot {
 
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
+
+    this.client.on('ready', this.roleRefresh);
   }
 
-  messageHandle = (message: Message) => {
+  roleRefresh = () => {
+    const ch = new TextChannel(this.client.channels.cache.get(channels.roles));
+  };
+
+  messageHandle = async (message: Message) => {
     if (message.author.bot) return;
     if (!message.content.startsWith(this.config.prefix)) {
       if (message.channel.id === channels.introductions // Message is in the introductions channel
         && message.content.includes(' ') // Message is longer than one word
         && message.member // Person is real
         && !(message.member.roles.cache.has('742797850630684762'))) { // ID of "member" role
-        message.member.roles.add('742797850630684762').then(() => {
+        try {
+          await message.member.roles.add('742797850630684762');
+          await message.member.send(`Great! Get some roles over in <#${channels.roles}> to connect with others who share your interests and join the discussion in <#${channels.lobby}>!`);
           console.log(`Gave member role to ${message.member.user.tag}`);
-          message.member.send(`Great! Get some roles over in <#${channels.roles}> to connect with others who share your interests and join the discussion in <#${channels.lobby}>!`).then(() => { })
-            .catch(() => {
-              console.log(`Oh no, there was an issue messaging ${message.member.user.tag}`);
-            });
-        }).catch(() => {
-          console.log(`Oh no, there was an issue giving ${message.member.user.tag} the member role`);
-        });
+        } catch {
+          console.log(`Oh no, there was an issue giving the member role to or messaging ${message.member.user.tag}`);
+        }
       }
     } else {
       const commandString = message.content.substr(this.config.prefix.length).trim().split(' ');
@@ -88,15 +93,18 @@ export default class Bot {
           functions.Roles(message, reply);
           break;
         case 'roleremove':
-          functions.roleremove(message, commandString, reply);
+          await functions.roleremove(message, commandString, reply);
           break;
         default:
           reply.setDescription('Unknown command!');
       }
 
-      message.channel.send(reply).then(() => {
+      try {
+        await message.channel.send(reply);
         console.log('Response sent');
-      }).catch(() => { });
+      } catch {
+        console.error();
+      }
     }
   };
 
