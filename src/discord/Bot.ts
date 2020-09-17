@@ -43,13 +43,7 @@ export default class Bot {
 
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
-
-    this.client.on('ready', this.roleRefresh);
   }
-
-  roleRefresh = () => {
-    const ch = new TextChannel(this.client.channels.cache.get(channels.roles));
-  };
 
   messageHandle = async (message: Message) => {
     if (message.author.bot) return;
