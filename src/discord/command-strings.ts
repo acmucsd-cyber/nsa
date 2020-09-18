@@ -30,7 +30,7 @@ export default [
     fields: [
       {
         name: 'User Commands:',
-        value: '```\n-help\n-resources \n-FAQ\n-GettingStarted\n-toolkit or -tk\n-roleremove\n```',
+        value: '```\n-help\n-resources \n-FAQ\n-GettingStarted\n-toolkit or -tk\n-roleremove\n-name\n```',
       },
       {
         name: 'Goon / Admin Commands:',
