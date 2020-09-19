@@ -123,10 +123,7 @@ Remember you can only submit flags here in DM.`);
           break;
         case 'flag':
           if (message.guild !== null) {
-            this.redactFlagSubmission(message).then(() => {}).catch((error) => {
-              console.log(`Oh no, there was an issue deleting a possible flag submission from user ${message.member?.user.tag} in channel ID ${message.channel.id}:`);
-              console.log(error);
-            });
+            await this.redactFlagSubmission(message);
             noReply = true; // Avoid embarrassing the user with a reply saying that the message is deleted.
             break;
           }
