@@ -40,31 +40,27 @@ export const roleremove = async (message: Message, commandString: string[], embe
     return;
   }
   if (message.member === null) {
-    embed.setDescription('Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM.');
-    return;
+    throw Error('Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM.');
   }
   if (!message.member.roles.cache.some((role) => role.name.toLowerCase() === commandString[1])) {
-    embed.setDescription("You don't have that role.");
-    return;
+    throw Error("You don't have that role.");
   }
+
   let msg = "That role can't be removed, sorry. Ask a Goon or Admin to remove it for you.";
 
-  const results = roles.map((category) => {
-    if (category.roles.some((r) => r.name.toLowerCase() === commandString[1])) {
-      return message.guild?.member(message.member.user.id)?.roles.remove(category.roles.find((role) => role.name.toLowerCase() === commandString[1]).roleID);
-    }
-    return undefined;
-  }).filter(Boolean);
+  const toRemove = [];
+  roles.forEach((category) => {
+    const roletoremove = category.roles.find((role) => role.name.toLowerCase() === commandString[1])?.roleID;
 
-  if (results.length) {
-    try {
-      await Promise.all(results);
-      console.log(`Removed ${message.member.user.username} from the ${commandString[1].toLowerCase()} role`);
-      msg = `Removed you from the ${commandString[1].toLowerCase()} role.`;
-    } catch {
-      // dwai
+    if (roletoremove) {
+      toRemove.push(message.guild?.member(message.member.user.id)?.roles.remove(roletoremove));
     }
-  }
+  });
+
+  (await Promise.all(toRemove)).forEach(() => {
+    console.log(`Removed ${message.member.user.username} from the ${commandString[1].toLowerCase()} role`);
+    msg = `Removed you from the ${commandString[1].toLowerCase()} role.`;
+  });
 
   embed.setDescription(msg);
 };

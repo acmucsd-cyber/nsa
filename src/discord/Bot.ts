@@ -1,5 +1,5 @@
 import {
-  Client, Message, MessageEmbed, MessageReaction, User,
+  Client, Message, MessageEmbed, MessageReaction, User, TextChannel,
 } from 'discord.js';
 import roles from './roles';
 import commands from './command-strings';
@@ -38,9 +38,43 @@ export default class Bot {
         });
     });
 
-    this.client.on('message', (message) => {
-      this.messageHandle(message).then(() => { }).catch(console.error);
-    });
+    // eslint-disable-next-line
+    this.client.on('message', this.messageHandle);
+
+    /* this.client.on('ready', () => {
+      const channel = this.client.guilds.cache.get(guildID)?.channels.cache.get(channels.roles);
+      if (channel?.type === 'text') {
+        const textChannel = channel as TextChannel;
+
+        textChannel.bulkDelete(10)
+          .then(() => { })
+          .catch(() => { });
+
+        roles.forEach((category) => {
+          const roleCat = new MessageEmbed()
+            .setTitle(category.category)
+            .setColor(8388608);
+
+          category.roles.forEach((role) => roleCat.addField(role.name, `<:${role.name.toLowerCase().replace(/\W/g, '')}:${role.emoteID}>`));
+
+          textChannel.send(roleCat)
+            .then((reactMessage) => {
+              category.roles.forEach((role) => {
+                reactMessage.react(role.emoteID)
+                  .then(() => { })
+                  .catch(() => {
+                    console.log(`Error reacting with ${role.name}`);
+                  });
+              });
+            })
+            .catch(() => { });
+        });
+
+        textChannel.send(`Roles last updated on ${new Date().toString()}`)
+          .then(() => { })
+          .catch(() => { });
+      }
+    }); */
 
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
@@ -48,58 +82,55 @@ export default class Bot {
 
   messageHandle = async (message: Message) => {
     if (message.author.bot) return;
-    if (!message.content.startsWith(this.config.prefix)) {
-      if (message.channel.id === channels.introductions // Message is in the introductions channel
-        && message.content.includes(' ') // Message is longer than one word
-        && message.member // Person is real
-        && !(message.member.roles.cache.has('742797850630684762'))) { // ID of "member" role
-        try {
-          await message.member.roles.add('742797850630684762');
-          await message.member.send(`Great! Get some roles over in <#${channels.roles}> to connect with others who share your interests and join the discussion in <#${channels.lobby}>!`);
-          console.log(`Gave member role to ${message.member.user.tag}`);
-        } catch {
-          console.log(`Oh no, there was an issue giving the member role to or messaging ${message.member.user.tag}`);
-        }
-      }
-    } else {
-      const commandString = message.content.substr(this.config.prefix.length).trim().split(' ');
-      const reply = new MessageEmbed()
-        .setColor(8388608)
-        .setTitle('NSA')
-        .setURL('http://github.com/acmucsd-cyber/nsa')
-        .setFooter("I'm Watching You 👁️");
-      switch (commandString[0].toLowerCase()) {
-        case 'toolkit':
-        case 'tk':
-          functions.tk(commandString, reply);
-          break;
-        case 'name':
-          reply.setDescription(`What about this name:\n **${generateName(commandString)}**`);
-          break;
-        case 'help':
-        case 'gettingstarted':
-        case 'faq':
-          reply.addFields(commands.find((command) => command.name === commandString[0].toLowerCase()).fields);
-          break;
-        case 'resources':
-          functions.resources(reply);
-          break;
-        case 'roles':
-          functions.Roles(message, reply);
-          break;
-        case 'roleremove':
-          await functions.roleremove(message, commandString, reply);
-          break;
-        default:
-          reply.setDescription('Unknown command!');
-      }
 
-      try {
+    try {
+      if (!message.content.startsWith(this.config.prefix)) {
+        if (message.channel.id === channels.introductions // Message is in the introductions channel
+          && message.content.includes(' ') // Message is longer than one word
+          && message.member // Person is real
+          && !(message.member.roles.cache.has('742797850630684762'))) { // ID of "member" role
+          await message.member.roles.add('742797850630684762');
+          console.log(`Gave member role to ${message.member.user.tag}`);
+          await message.member.send(`Great! Get some roles over in <#${channels.roles}> to connect with others who share your interests and join the discussion in <#${channels.lobby}>!`);
+        }
+      } else {
+        const commandString = message.content.substr(this.config.prefix.length).trim().split(' ');
+        const reply = new MessageEmbed()
+          .setColor(8388608)
+          .setTitle('NSA')
+          .setURL('http://github.com/acmucsd-cyber/nsa')
+          .setFooter("I'm Watching You 👁️");
+        switch (commandString[0].toLowerCase()) {
+          case 'toolkit':
+          case 'tk':
+            functions.tk(commandString, reply);
+            break;
+          case 'name':
+            reply.setDescription(`What about this name:\n **${generateName(commandString)}**`);
+            break;
+          case 'help':
+          case 'gettingstarted':
+          case 'faq':
+            reply.addFields(commands.find((command) => command.name === commandString[0].toLowerCase()).fields);
+            break;
+          case 'resources':
+            functions.resources(reply);
+            break;
+          case 'roles':
+            functions.Roles(message, reply);
+            break;
+          case 'roleremove':
+            await functions.roleremove(message, commandString, reply);
+            break;
+          default:
+            reply.setDescription('Unknown command!');
+        }
+
         await message.channel.send(reply);
         console.log('Response sent');
-      } catch (error) {
-        console.error(error);
       }
+    } catch (e) {
+      await message.channel.send(e);
     }
   };
 
