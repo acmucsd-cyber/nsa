@@ -1,5 +1,5 @@
 import {
-  Client, Message, MessageEmbed, MessageReaction, User, TextChannel,
+  Client, Message, MessageEmbed, MessageReaction, User,
 } from 'discord.js';
 import roles from './roles';
 import commands from './command-strings';
