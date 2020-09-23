@@ -40,42 +40,6 @@ export default class Bot {
 
     // eslint-disable-next-line
     this.client.on('message', this.messageHandle);
-
-    /* this.client.on('ready', () => {
-      const channel = this.client.guilds.cache.get(guildID)?.channels.cache.get(channels.roles);
-      if (channel?.type === 'text') {
-        const textChannel = channel as TextChannel;
-
-        textChannel.bulkDelete(10)
-          .then(() => { })
-          .catch(() => { });
-
-        roles.forEach((category) => {
-          const roleCat = new MessageEmbed()
-            .setTitle(category.category)
-            .setColor(8388608);
-
-          category.roles.forEach((role) => roleCat.addField(role.name, `<:${role.name.toLowerCase().replace(/\W/g, '')}:${role.emoteID}>`));
-
-          textChannel.send(roleCat)
-            .then((reactMessage) => {
-              category.roles.forEach((role) => {
-                reactMessage.react(role.emoteID)
-                  .then(() => { })
-                  .catch(() => {
-                    console.log(`Error reacting with ${role.name}`);
-                  });
-              });
-            })
-            .catch(() => { });
-        });
-
-        textChannel.send(`Roles last updated on ${new Date().toString()}`)
-          .then(() => { })
-          .catch(() => { });
-      }
-    }); */
-
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
   }
