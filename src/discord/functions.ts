@@ -2,7 +2,6 @@ import { timingSafeEqual } from 'crypto';
 import { User, Message, MessageEmbed } from 'discord.js';
 import { Database } from 'sqlite';
 import sqlite3 from 'sqlite3';
-// import Bot from './Bot';
 import roles from './roles';
 import toolkit from './toolkit';
 import commands from './command-strings';
@@ -15,13 +14,14 @@ export const formatEmbed = ($embed: MessageEmbed) => {
     .setURL('http://github.com/acmucsd-cyber/nsa')
     .setFooter("I'm Watching You 👁️");
 };
-export const Roles = (message: Message, $embed: MessageEmbed) => {
+
+export const Roles = (message: Message, embed: MessageEmbed) => {
   if (!(message.member?.roles.cache.find((role) => role.name === 'Goon' || role.name === 'Board' || role.name === 'Admin' || role.name === 'Discord Bot Dev'))) {
-    $embed.setDescription(`Only Goons, Admins, Board, or Bot Devs can use this command. Check out <#${channels.roles}> to get roles.`);
+    embed.setDescription(`Only Goons, Admins, Board, or Bot Devs can use this command. Check out <#${channels.roles}> to get roles.`);
     return;
   }
   if (message.channel.id !== channels.roles) { // ID of the roles channel
-    $embed.setDescription('Please only use this command in the roles channel!');
+    embed.setDescription('Please only use this command in the roles channel!');
     return;
   }
   message.channel.bulkDelete(10, true).then(() => { }).catch(() => { });
@@ -42,7 +42,7 @@ export const Roles = (message: Message, $embed: MessageEmbed) => {
         });
       }).catch(() => { });
   });
-  $embed.setDescription(`Roles last updated on  ${new Date().toString()}`);
+  embed.setDescription(`Roles last updated on  ${new Date().toString()}`);
 };
 
 export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, flagUsers: Set<User>, realFlag: Buffer, commandArgs: string[], message: Message, embed: MessageEmbed) => {
@@ -82,45 +82,49 @@ export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, fl
   embed.setDescription('Please wait while your flag is checked...');
 };
 
-export const roleremove = (message: Message, commandString: string[], $embed: MessageEmbed) => {
+export const roleremove = async (message: Message, commandString: string[], embed: MessageEmbed) => {
   if (commandString.length !== 2) {
-    $embed.addFields(commands.find((command) => command.name === 'roleremove').fields);
+    embed.addFields(commands.find((command) => command.name === 'roleremove').fields);
     return;
   }
   if (message.member === null) {
-    $embed.setDescription('Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM.');
-    return;
+    throw Error('Cannot remove role. Make sure you are messaging me in any ACM Cyber channel and not in DM.');
   }
-  if (!message.member.roles.cache.find((role) => role.name.toLowerCase() === commandString[1])) {
-    $embed.setDescription("You don't have that role.");
-    return;
+  if (!message.member.roles.cache.some((role) => role.name.toLowerCase() === commandString[1])) {
+    throw Error("You don't have that role.");
   }
-  $embed.setDescription("That role can't be removed, sorry. Ask a Goon or Admin to remove it for you.");
+
+  embed.setDescription("That role can't be removed, sorry. Ask a Goon or Admin to remove it for you.");
+  const toRemove = [];
   roles.forEach((category) => {
-    if (category.roles.some((r) => r.name.toLowerCase() === commandString[1])) {
-      message.guild?.member(message.member.user.id)?.roles.remove(category.roles.find((role) => role.name.toLowerCase() === commandString[1]).roleID).then(() => {
-        console.log(`Removed ${message.member.user.username} from the ${commandString[1].toLowerCase()} role`);
-        $embed.setDescription(`Removed you from the ${commandString[1].toLowerCase()} role.`);
-      }).catch(() => { });
+    const roletoremove = category.roles.find((role) => role.name.toLowerCase() === commandString[1])?.roleID;
+
+    if (roletoremove) {
+      toRemove.push(message.guild?.member(message.member.user.id)?.roles.remove(roletoremove));
     }
+  });
+
+  (await Promise.all(toRemove)).forEach(() => {
+    console.log(`Removed ${message.member.user.username} from the ${commandString[1].toLowerCase()} role`);
+    embed.setDescription(`Removed you from the ${commandString[1].toLowerCase()} role.`);
   });
 };
 
-export const tk = (commandString: string[], $embed: MessageEmbed) => {
+export const tk = (commandString: string[], embed: MessageEmbed) => {
   if (toolkit.some((category) => category.name === commandString[1])) {
-    $embed.addFields(toolkit.find((category) => category.name === commandString[1]).fields);
+    embed.addFields(toolkit.find((category) => category.name === commandString[1]).fields);
   } else {
-    $embed.addFields(commands.find((command) => command.name === 'toolkit').fields);
+    embed.addFields(commands.find((command) => command.name === 'toolkit').fields);
   }
 };
 
-export const resources = ($embed: MessageEmbed) => {
+export const resources = (embed: MessageEmbed) => {
   let content: string;
   channels.categories.forEach((category) => {
     content = '';
     category.channels.forEach((id) => {
       content += `<#${id}>\n`;
     });
-    $embed.addField(category.name, content);
+    embed.addField(category.name, content);
   });
 };

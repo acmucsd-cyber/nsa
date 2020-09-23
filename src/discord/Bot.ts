@@ -1,5 +1,5 @@
 import {
-  Client, Message, MessageEmbed, MessageReaction, User,
+  Client, GuildMember, Message, MessageEmbed, MessageReaction, User,
 } from 'discord.js';
 import sqlite3 from 'sqlite3';
 import { Database } from 'sqlite';
@@ -31,29 +31,16 @@ export default class Bot {
     });
   }
 
-  public async connect() {
-    // Connects to Discord
-    try {
+  public async connect(): Promise<Client> {
       await this.client.login(this.config.token);
-      console.log(`Logged in as: ${this.client.user.tag}`);
       await this.client.user.setActivity('You', { type: 'WATCHING' });
-    } catch {
-      console.log('Failed to login');
-    }
+      return this.client;
   }
 
   public listen() {
-    this.client.on('guildMemberAdd', (member) => {
-      if (member.user.bot) return;
-      console.log('A new member has joined');
-      member.send(`Welcome to ACM Cyber! We’re excited to have you with us during our first year as a student organization.\n Our three pillars (Learn, Practice, and Participate) drive our decisions as a club and the events we hold. As you know, we host technical events to introduce our members to various concepts in cybersecurity and industry panels to form connections with the greater computing community. We are always open for feedback for workshops and any ideas for events we can hold! If you have an idea about an event you’d like to see come to fruition, pitch it in the Ideas channel! This channel is for you to voice your opinion about anything you would like to see! Whether you would like to teach a workshop yourself or have us hold a workshop on this topic, please let us know through this channel! \n **First, however, please read the rules in <#${channels.rules}> and introduce yourself in <#${channels.introductions}> to gain access to the rest of the server.**`).then(() => { })
-        .catch(() => {
-          console.log(`Oh no, there was an issue messaging ${member.user.tag}`);
-        });
-    });
+    this.client.on('guildMemberAdd', this.memberAddHandle);
 
     this.client.on('message', (message) => { this.messageHandle(message).then(() => {}).catch(console.error); });
-
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
   }
@@ -77,6 +64,13 @@ Remember you can only submit flags here in DM.`);
     console.log(`Sent DM to ${message.member?.user.tag} notifying -flag command deletion.`);
   };
 
+  memberAddHandle = async (member: GuildMember) => {
+    if (member.user.bot) return;
+
+    console.log('A new member has joined');
+    await member.send(`Welcome to ACM Cyber! We’re excited to have you with us during our first year as a student organization.\n Our three pillars (Learn, Practice, and Participate) drive our decisions as a club and the events we hold. As you know, we host technical events to introduce our members to various concepts in cybersecurity and industry panels to form connections with the greater computing community. We are always open for feedback for workshops and any ideas for events we can hold! If you have an idea about an event you’d like to see come to fruition, pitch it in the Ideas channel! This channel is for you to voice your opinion about anything you would like to see! Whether you would like to teach a workshop yourself or have us hold a workshop on this topic, please let us know through this channel! \n **First, however, please read the rules in <#${channels.rules}> and introduce yourself in <#${channels.introductions}> to gain access to the rest of the server.**`)
+  }
+
   messageHandle = async (message: Message) => {
     if (message.author.bot) return;
     if (!message.content.startsWith(this.config.prefix)) {
@@ -84,7 +78,7 @@ Remember you can only submit flags here in DM.`);
         && message.content.includes(' ') // Message is longer than one word
         && message.member // Person is real
         && !(message.member.roles.cache.has('742797850630684762'))) { // ID of "member" role
-        message.member.roles.add('742797850630684762').then(() => {
+        await message.member.roles.add('742797850630684762').then(() => {
           console.log(`Gave member role to ${message.member.user.tag}`);
           message.member.send(`Great! Get some roles over in <#${channels.roles}> to connect with others who share your interests and join the discussion in <#${channels.lobby}>!`).then(() => { })
             .catch(() => {
@@ -143,13 +137,10 @@ Remember you can only submit flags here in DM.`);
 
       if (noReply) {
         console.log('No reply for this message.');
-      } else {
-        // message.channel.send(reply).then(() => {
-        //   console.log('Response sent');
-        // }).catch(() => { });
+        return;
+      }
         await message.channel.send(reply);
         console.log('Response sent');
-      }
     }
   };
 
