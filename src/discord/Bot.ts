@@ -17,15 +17,10 @@ export default class Bot {
     this.config = config;
   }
 
-  public async connect() {
-    // Connects to Discord
-    try {
+  public async connect(): Promise<Client> {
       await this.client.login(this.config.token);
-      console.log(`Logged in as: ${this.client.user.tag}`);
       await this.client.user.setActivity('You', { type: 'WATCHING' });
-    } catch {
-      console.log('Failed to login');
-    }
+      return this.client;
   }
 
   public listen() {

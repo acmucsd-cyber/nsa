@@ -5,4 +5,6 @@ import Bot from './discord/Bot';
 const bot = new Bot(config.discord);
 // bot.connect();
 bot.listen();
-bot.connect().then(() => { }).catch(() => { });
+bot.connect()
+    .then((client) => console.log(`Logged in as: ${client.user.tag}`))
+    .catch((err) => console.log(`Failed to connect to discord! Error: ${err}`));
