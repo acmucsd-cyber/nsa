@@ -1,5 +1,5 @@
 import {
-  Client, Message, MessageEmbed, MessageReaction, User,
+  Client, GuildMember, Message, MessageEmbed, MessageReaction, User,
 } from 'discord.js';
 import roles from './roles';
 import commands from './command-strings';
@@ -29,19 +29,18 @@ export default class Bot {
   }
 
   public listen() {
-    this.client.on('guildMemberAdd', (member) => {
-      if (member.user.bot) return;
-      console.log('A new member has joined');
-      member.send(`Welcome to ACM Cyber! We’re excited to have you with us during our first year as a student organization.\n Our three pillars (Learn, Practice, and Participate) drive our decisions as a club and the events we hold. As you know, we host technical events to introduce our members to various concepts in cybersecurity and industry panels to form connections with the greater computing community. We are always open for feedback for workshops and any ideas for events we can hold! If you have an idea about an event you’d like to see come to fruition, pitch it in the Ideas channel! This channel is for you to voice your opinion about anything you would like to see! Whether you would like to teach a workshop yourself or have us hold a workshop on this topic, please let us know through this channel! \n **First, however, please read the rules in <#${channels.rules}> and introduce yourself in <#${channels.introductions}> to gain access to the rest of the server.**`).then(() => { })
-        .catch(() => {
-          console.log(`Oh no, there was an issue messaging ${member.user.tag}`);
-        });
-    });
+    this.client.on('guildMemberAdd', this.memberAddHandle);
 
-    // eslint-disable-next-line
     this.client.on('message', this.messageHandle);
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
+  }
+
+  memberAddHandle = async (member: GuildMember) => {
+    if (member.user.bot) return;
+
+    console.log('A new member has joined');
+    await member.send(`Welcome to ACM Cyber! We’re excited to have you with us during our first year as a student organization.\n Our three pillars (Learn, Practice, and Participate) drive our decisions as a club and the events we hold. As you know, we host technical events to introduce our members to various concepts in cybersecurity and industry panels to form connections with the greater computing community. We are always open for feedback for workshops and any ideas for events we can hold! If you have an idea about an event you’d like to see come to fruition, pitch it in the Ideas channel! This channel is for you to voice your opinion about anything you would like to see! Whether you would like to teach a workshop yourself or have us hold a workshop on this topic, please let us know through this channel! \n **First, however, please read the rules in <#${channels.rules}> and introduce yourself in <#${channels.introductions}> to gain access to the rest of the server.**`)
   }
 
   messageHandle = async (message: Message) => {
