@@ -15,36 +15,6 @@ export const formatEmbed = ($embed: MessageEmbed) => {
     .setFooter("I'm Watching You 👁️");
 };
 
-export const Roles = (message: Message, embed: MessageEmbed) => {
-  if (!(message.member?.roles.cache.find((role) => role.name === 'Goon' || role.name === 'Board' || role.name === 'Admin' || role.name === 'Discord Bot Dev'))) {
-    embed.setDescription(`Only Goons, Admins, Board, or Bot Devs can use this command. Check out <#${channels.roles}> to get roles.`);
-    return;
-  }
-  if (message.channel.id !== channels.roles) { // ID of the roles channel
-    embed.setDescription('Please only use this command in the roles channel!');
-    return;
-  }
-  message.channel.bulkDelete(10, true).then(() => { }).catch(() => { });
-  let roleCat: MessageEmbed;
-  roles.forEach((category) => {
-    roleCat = new MessageEmbed()
-      .setColor(8388608);
-    roleCat.setTitle(category.category);
-    category.roles.forEach((role) => {
-      roleCat.addField(role.name, `<:${role.name.toLowerCase().replace(/\W/g, '')}:${role.emoteID}>`);
-    });
-    message.channel.send(roleCat)
-      .then((reactMessage) => {
-        category.roles.forEach((role) => {
-          reactMessage.react(role.emoteID).then(() => { }).catch(() => {
-            console.log(`Error reacting with ${role.name}`);
-          });
-        });
-      }).catch(() => { });
-  });
-  embed.setDescription(`Roles last updated on  ${new Date().toString()}`);
-};
-
 export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, flagUsers: Set<User>, realFlag: Buffer, commandArgs: string[], message: Message, embed: MessageEmbed) => {
   if (commandArgs.length === 2) {
     embed.setDescription('Please make sure to include both a flag **and** a challenge');
@@ -73,7 +43,7 @@ export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, fl
     await message.channel.send(msg);
   };
   setTimeout(() => {
-    checkFlags().then(() => {}).catch((error) => {
+    checkFlags().then(() => { }).catch((error) => {
       console.error(`Failed to check flag for user ${message.author.tag}`);
       console.error(error);
     }).finally(() => { flagUsers.delete(message.author); });

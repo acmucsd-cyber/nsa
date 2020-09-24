@@ -47,7 +47,7 @@ export default [
       },
       {
         name: 'Goon / Admin Commands:',
-        value: '```\n-roles\n```',
+        value: '```\nNone\n```',
       },
     ],
   },

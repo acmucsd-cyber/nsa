@@ -2,7 +2,8 @@ declare interface Config {
   discord: DiscordConfig,
   challenges: Challenge[],
   channels: Channels,
-  sqliteDbPath: string
+  sqliteDbPath: string,
+  guildID: string
 }
 
 declare interface DiscordConfig {
