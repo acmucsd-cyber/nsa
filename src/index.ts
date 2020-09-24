@@ -1,8 +1,11 @@
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
+import adjNoun from 'adj-noun';
 
 import config from './config.json';
 import Bot from './discord/Bot';
+
+const SEED_RANGE = 2147483648; // must be significantly smaller than Number.MAX_SAFE_INTEGER or adj-noun may give undefined stuff on fractional values
 
 const initDatabase = async (db: Database<sqlite3.Database, sqlite3.Statement>) => {
   console.log('Database is empty, initializing database for the first time...');
@@ -12,6 +15,9 @@ const initDatabase = async (db: Database<sqlite3.Database, sqlite3.Statement>) =
 };
 
 const init = async () => {
+  const seed = Math.floor(Math.random() * SEED_RANGE);
+  console.log(`Using seed ${seed} for adj-noun`);
+  adjNoun.seed(seed);
   const db = await open({
     filename: config.sqliteDbPath,
     driver: sqlite3.Database,

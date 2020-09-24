@@ -4,8 +4,6 @@ import parser from 'yargs-parser';
 
 import commands from './command-strings';
 
-const SEED_RANGE = 2147483648; // must be significantly smaller than Number.MAX_SAFE_INTEGER or adj-noun may give undefined stuff on fractional values
-
 const LEET_TABLE = new Map([
   ['a', '4'],
   ['e', '3'],
@@ -19,7 +17,6 @@ const leetify = (s: string, coverage: number) => s.replace(LEET_REPLACE_CHARS,
   (char) => ((Math.random() < coverage) ? LEET_TABLE.get(char) : char));
 
 export default function generateName(commandArgs: string[], embed: MessageEmbed): void {
-  adjNoun.seed(Math.floor(Math.random() * SEED_RANGE));
   const args = parser(commandArgs.slice(1), {
     default: { leet: false, help: false, separator: ' ' },
     boolean: ['leet', 'help'],
