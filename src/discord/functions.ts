@@ -17,7 +17,11 @@ export const formatEmbed = ($embed: MessageEmbed) => {
 
 export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, flagUsers: Set<User>, realFlag: Buffer, commandArgs: string[], message: Message, embed: MessageEmbed) => {
   if (commandArgs.length === 2) {
-    embed.setDescription('Please make sure to include both a flag **and** a challenge');
+    embed.setDescription('Please make sure to include the challenge name **as well as** the flag you get.');
+    return;
+  }
+  if (commandArgs.length > 3) {
+    embed.setDescription('Too many arguments provided. Please put exactly one flag after the challenge name.');
     return;
   }
   if (flagUsers.has(message.author)) {
