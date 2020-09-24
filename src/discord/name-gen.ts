@@ -29,15 +29,12 @@ export default function generateName(commandArgs: string[], embed: MessageEmbed)
   // if (remaindingArgs.length != 0) {
   //     console.log(`Unrecognized arguments: ${remaindingArgs.join(' ')}`)
   // }
-  let name: string[] = adjNoun();
+  let name = adjNoun();
   if (args.help) { // Provide help message
     embed.addFields(commands.find((command) => command.name === 'name').fields);
     return;
   }
   if (args.leet) {
-    // for (let i = 0; i < name.length; i++) {
-    //   name[i] = leetify(name[i], 1);
-    // }
     name = name.map((s) => leetify(s, 1));
   }
   embed.setDescription(name.join(args.separator));
