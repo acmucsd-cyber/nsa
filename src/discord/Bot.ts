@@ -113,7 +113,7 @@ Remember you can only submit flags here in DM.`);
           functions.resources(reply);
           break;
         case 'roleremove':
-          functions.roleremove(message, commandString, reply);
+          await functions.roleremove(message, commandString, reply);
           break;
         case 'flag':
           if (message.guild !== null) {
