@@ -81,4 +81,21 @@ export default [
       },
     ],
   },
+  {
+    name: 'name',
+    fields: [
+      {
+        name: 'Usage:',
+        value: '```-name [OPTIONS]...```',
+      },
+      {
+        name: 'Description:',
+        value: 'Generate a random username/handle for you in the format of _ADJECTIVE NOUN_ (Ex. silvery school).',
+      },
+      {
+        name: 'Options:',
+        value: '**--help**\nSee this help message\n**--leet**\nMake your username l33t\n**--separator** _SEPARATOR_\nWhat to put between adjectives and nouns\nEx. `-name --separator _`\nsilvery_school',
+      },
+    ],
+  },
 ];
