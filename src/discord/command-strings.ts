@@ -4,7 +4,7 @@ export default [
     fields: [
       {
         name: 'Usage:',
-        value: '```-toolkit [category] ```or ```-tk [category]```\n',
+        value: '```-toolkit CATEGORY ```or ```-tk CATEGORY```\n',
       },
       {
         name: 'Description',
@@ -17,7 +17,7 @@ export default [
     fields: [
       {
         name: 'Usage:',
-        value: '```-flag [challenge name] [flag]```',
+        value: '```-flag CHALLENGE_NAME FLAG```',
       },
       {
         name: 'Description:',
@@ -30,7 +30,7 @@ export default [
     fields: [
       {
         name: 'Usage:',
-        value: '```-roleremove [role]```',
+        value: '```-roleremove ROLE```',
       },
       {
         name: 'Description',
