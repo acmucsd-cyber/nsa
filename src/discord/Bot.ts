@@ -1,5 +1,5 @@
 import {
-  Client, GuildMember, Message, MessageEmbed, MessageReaction, User,
+  Client, GuildMember, Message, MessageEmbed, MessageReaction, TextChannel, User,
 } from 'discord.js';
 import sqlite3 from 'sqlite3';
 import { Database } from 'sqlite';
@@ -7,7 +7,7 @@ import roles from './roles';
 import commands from './command-strings';
 import { generateName } from './name-gen';
 import * as functions from './functions';
-import { channels, challenges } from '../config.json';
+import { channels, challenges, guildID } from '../config.json';
 
 export default class Bot {
   private readonly client: Client;
@@ -32,15 +32,18 @@ export default class Bot {
   }
 
   public async connect(): Promise<Client> {
-      await this.client.login(this.config.token);
-      await this.client.user.setActivity('You', { type: 'WATCHING' });
-      return this.client;
+    await this.client.login(this.config.token);
+    await this.client.user.setActivity('You', { type: 'WATCHING' });
+    return this.client;
   }
 
   public listen() {
+    // eslint-disable-next-line
     this.client.on('guildMemberAdd', this.memberAddHandle);
 
-    this.client.on('message', (message) => { this.messageHandle(message).then(() => {}).catch(console.error); });
+    this.client.on('ready', this.roleRefresh);
+
+    this.client.on('message', (message) => { this.messageHandle(message).then(() => { }).catch(console.error); });
     this.client.on('messageReactionAdd', this.messageReactionAddHandle);
     this.client.on('messageReactionRemove', this.messageReactionRemoveHandle);
   }
@@ -68,8 +71,8 @@ Remember you can only submit flags here in DM.`);
     if (member.user.bot) return;
 
     console.log('A new member has joined');
-    await member.send(`Welcome to ACM Cyber! We’re excited to have you with us during our first year as a student organization.\n Our three pillars (Learn, Practice, and Participate) drive our decisions as a club and the events we hold. As you know, we host technical events to introduce our members to various concepts in cybersecurity and industry panels to form connections with the greater computing community. We are always open for feedback for workshops and any ideas for events we can hold! If you have an idea about an event you’d like to see come to fruition, pitch it in the Ideas channel! This channel is for you to voice your opinion about anything you would like to see! Whether you would like to teach a workshop yourself or have us hold a workshop on this topic, please let us know through this channel! \n **First, however, please read the rules in <#${channels.rules}> and introduce yourself in <#${channels.introductions}> to gain access to the rest of the server.**`)
-  }
+    await member.send(`Welcome to ACM Cyber! We’re excited to have you with us during our first year as a student organization.\n Our three pillars (Learn, Practice, and Participate) drive our decisions as a club and the events we hold. As you know, we host technical events to introduce our members to various concepts in cybersecurity and industry panels to form connections with the greater computing community. We are always open for feedback for workshops and any ideas for events we can hold! If you have an idea about an event you’d like to see come to fruition, pitch it in the Ideas channel! This channel is for you to voice your opinion about anything you would like to see! Whether you would like to teach a workshop yourself or have us hold a workshop on this topic, please let us know through this channel! \n **First, however, please read the rules in <#${channels.rules}> and introduce yourself in <#${channels.introductions}> to gain access to the rest of the server.**`);
+  };
 
   messageHandle = async (message: Message) => {
     if (message.author.bot) return;
@@ -109,11 +112,8 @@ Remember you can only submit flags here in DM.`);
         case 'resources':
           functions.resources(reply);
           break;
-        case 'roles':
-          functions.Roles(message, reply);
-          break;
         case 'roleremove':
-          functions.roleremove(message, commandString, reply);
+          await functions.roleremove(message, commandString, reply);
           break;
         case 'flag':
           if (message.guild !== null) {
@@ -139,8 +139,43 @@ Remember you can only submit flags here in DM.`);
         console.log('No reply for this message.');
         return;
       }
-        await message.channel.send(reply);
-        console.log('Response sent');
+      await message.channel.send(reply);
+      console.log('Response sent');
+    }
+  };
+
+  roleRefresh = () => {
+    const channel = this.client.guilds.cache.get(guildID)?.channels.cache.get(channels.roles);
+    if (channel?.type === 'text') {
+      const textChannel = channel as TextChannel;
+
+      textChannel.bulkDelete(10, true)
+        .then(() => { })
+        .catch(() => { });
+
+      roles.forEach((category) => {
+        const roleCat = new MessageEmbed()
+          .setTitle(category.category)
+          .setColor(8388608);
+
+        category.roles.forEach((role) => roleCat.addField(role.name, `<:${role.name.toLowerCase().replace(/\W/g, '')}:${role.emoteID}>`));
+
+        textChannel.send(roleCat)
+          .then((reactMessage) => {
+            category.roles.forEach((role) => {
+              reactMessage.react(role.emoteID)
+                .then(() => { })
+                .catch(() => {
+                  console.log(`Error reacting with ${role.name}`);
+                });
+            });
+          })
+          .catch(() => { });
+      });
+
+      textChannel.send(`Roles last updated on ${new Date().toString()}`)
+        .then(() => { })
+        .catch(() => { });
     }
   };
 
