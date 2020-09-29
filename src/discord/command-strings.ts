@@ -81,4 +81,35 @@ export default [
       },
     ],
   },
+  {
+    name: 'name',
+    fields: [
+      {
+        name: 'Usage:',
+        value: '```-name [OPTIONS]...```',
+      },
+      {
+        name: 'Description:',
+        value: 'Generate a random username/handle for you in the format of _ADJECTIVE NOUN_. (Ex. silvery school)',
+      },
+      {
+        name: 'Options:',
+        value: `**--help**
+See this help message
+**--leet**
+Default: false
+Make your username l33t
+**--separator** _SEPARATOR_
+Default: [a single space character]
+What to put between adjectives and nouns
+Ex. \`-name --separator _\`
+silvery_school
+**--fraction-leet** _FRACTION_
+Default: 0.7
+A number between 0.0 and 1.0 (inclusive) that controls the probability that each convertible letter (a, e, i, o, s) will be converted into its corresponding digit.
+A higher number results in names that tend to have more digits in it, but it may lead to less readable names.
+This option has no effect when **--leet** is false`,
+      },
+    ],
+  },
 ];

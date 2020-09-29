@@ -5,7 +5,7 @@ import sqlite3 from 'sqlite3';
 import { Database } from 'sqlite';
 import roles from './roles';
 import commands from './command-strings';
-import { generateName } from './name-gen';
+import generateName from './name-gen';
 import * as functions from './functions';
 import { channels, challenges, guildID } from '../config.json';
 
@@ -102,7 +102,8 @@ Remember you can only submit flags here in DM.`);
           functions.tk(commandString, reply);
           break;
         case 'name':
-          reply.setDescription(`What about this name:\n **${generateName(commandString)}**`);
+          generateName(commandString, reply);
+          // reply.setDescription(`What about this name:\n **${generateName(commandString)}**`);
           break;
         case 'help':
         case 'gettingstarted':
