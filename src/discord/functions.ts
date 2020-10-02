@@ -17,7 +17,7 @@ export const formatEmbed = ($embed: MessageEmbed) => {
 
 export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, flagUsers: Set<User>, realFlag: Buffer, commandArgs: string[], message: Message, embed: MessageEmbed) => {
   if (commandArgs.length === 2) {
-    embed.setDescription('Please make sure to include the challenge name **as well as** the flag you get.');
+    embed.setDescription('Please make sure to include the challenge name **as well as** the flag you got.');
     return;
   }
   if (commandArgs.length > 3) {
@@ -28,7 +28,7 @@ export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, fl
     embed.setDescription('Please wait for your last flag submission to be processed first.');
     return;
   }
-  if (await db.get('SELECT * from ctf_solves WHERE user_id = ? and challenge_name = ?',
+  if (await db.get('SELECT * FROM ctf_solves WHERE user_id = ? AND challenge_name = ?',
     [message.author.id, commandArgs[1]]) !== undefined) {
     embed.setDescription('You already solved this challenge.');
     return;
@@ -47,7 +47,7 @@ export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, fl
     await message.channel.send(msg);
   };
   setTimeout(() => {
-    checkFlags().then(() => { }).catch((error) => {
+    checkFlags().catch((error) => {
       console.error(`Failed to check flag for user ${message.author.tag}`);
       console.error(error);
     }).finally(() => { flagUsers.delete(message.author); });
