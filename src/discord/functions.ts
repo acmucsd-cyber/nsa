@@ -1,5 +1,5 @@
 import { timingSafeEqual } from 'crypto';
-import { User, Message, MessageEmbed } from 'discord.js';
+import { Message, MessageEmbed } from 'discord.js';
 import { Database } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import roles from './roles';
@@ -11,11 +11,11 @@ export const formatEmbed = ($embed: MessageEmbed) => {
   $embed
     .setColor(8388608)
     .setTitle('NSA')
-    .setURL('http://github.com/acmucsd-cyber/nsa')
+    .setURL('https://github.com/acmucsd-cyber/nsa')
     .setFooter("I'm Watching You 👁️");
 };
 
-export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, flagUsers: Set<User>, realFlag: Buffer, commandArgs: string[], message: Message, embed: MessageEmbed) => {
+export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, flagUsers: Set<string>, realFlag: Buffer, commandArgs: string[], message: Message, embed: MessageEmbed) => {
   if (commandArgs.length === 2) {
     embed.setDescription('Please make sure to include the challenge name **as well as** the flag you got.');
     return;
@@ -24,7 +24,7 @@ export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, fl
     embed.setDescription('Too many arguments provided. Please put exactly one flag after the challenge name.');
     return;
   }
-  if (flagUsers.has(message.author)) {
+  if (flagUsers.has(message.author.id)) {
     embed.setDescription('Please wait for your last flag submission to be processed first.');
     return;
   }
@@ -50,9 +50,9 @@ export const flag = async (db: Database<sqlite3.Database, sqlite3.Statement>, fl
     checkFlags().catch((error) => {
       console.error(`Failed to check flag for user ${message.author.tag}`);
       console.error(error);
-    }).finally(() => { flagUsers.delete(message.author); });
+    }).finally(() => { flagUsers.delete(message.author.id); });
   }, 1500);
-  flagUsers.add(message.author);
+  flagUsers.add(message.author.id);
   embed.setDescription('Please wait while your flag is checked...');
 };
 
