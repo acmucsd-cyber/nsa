@@ -16,7 +16,7 @@ export default class Bot {
 
   private readonly db: Database<sqlite3.Database, sqlite3.Statement>;
 
-  public checkingFlag: Set<User>;
+  public checkingFlag: Set<string>;
 
   private flags: Map<string, Buffer>;
 
@@ -24,7 +24,7 @@ export default class Bot {
     this.client = new Client();
     this.config = config;
     this.db = db;
-    this.checkingFlag = new Set<User>();
+    this.checkingFlag = new Set<string>();
     this.flags = new Map<string, Buffer>();
     challenges.forEach((challenge: Challenge) => {
       this.flags.set(challenge.name, Buffer.from(challenge.flag));
