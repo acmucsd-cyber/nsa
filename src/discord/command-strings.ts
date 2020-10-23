@@ -1,5 +1,22 @@
 export default [
   {
+    name: 'convert',
+    fields: [
+      {
+        name: 'Usage:',
+        value: '```-convert FROM TO YOUR_TEXT_HERE```\n',
+      },
+      {
+        name: 'Description',
+        value: 'Can be used to convert between any of the following:\n*a* -> Ascii\n*b* -> Binary\n*d* -> Decimal\n*h* -> Hex\n*6* -> Base64',
+      },
+      {
+        name: 'Input Format:',
+        value: 'ASCII: only utf-8 encoded charaters\nBinary: only 1, 0, and [space]\nDecimal: only 0-9 and [space]\nHex: only 0-9, a-f, and A-F allowed. 0x is allowed in front of string\nBase64: only a-z, A-Z, 0-9, +, /, and =',
+      },
+    ],
+  },
+  {
     name: 'toolkit',
     fields: [
       {
