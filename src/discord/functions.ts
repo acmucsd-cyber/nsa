@@ -102,3 +102,219 @@ export const resources = (embed: MessageEmbed) => {
     embed.addField(category.name, content);
   });
 };
+
+const validateInput = (input: string, base: string) => {
+  let isValid: boolean;
+  switch (base) {
+    case 'a':
+      isValid = true;
+      break;
+    case 'h':
+      isValid = (/^(0[xX])?[A-Fa-f0-9]+$/.test(input));
+      break;
+    case 'b':
+      isValid = (/^[0-1 ]{1,}$/.test(input));
+      break;
+    case 'd':
+      isValid = (/^[0-9 ]{1,}$/.test(input));
+      break;
+    case '6':
+      isValid = (/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(input));
+      break;
+    default:
+      isValid = false;
+      break;
+  }
+  return isValid;
+};
+
+const fromASCII = (command: string[]) => {
+  let output = '';
+  switch (command[0]) {
+    case 'b':
+      output = command[1].split('').map((char) => char.charCodeAt(0).toString(2)).join(' ');
+      break;
+    case 'd':
+      for (let i = 0; i < command[1].length; i += 1) {
+        output += `${command[1].charCodeAt(i)} `;
+      }
+      break;
+    case 'h':
+      output = `0x${Buffer.from(command[1]).toString('hex')}`;
+      break;
+    case '6':
+      output = Buffer.from(command[1]).toString('base64');
+      break;
+    case 'a':
+      // eslint-disable-next-line
+      output = command[1];
+      break;
+    default:
+      output = 'Oh no, something went wrong!';
+  }
+  return output.trim();
+};
+
+const fromHex = (command: string[]) => {
+  let output = '';
+  let hexVals: number[];
+  if (command[1].substring(0, 2) === '0x') {
+    hexVals = command[1].match(/.{1,2}/g).slice(1).map((value) => parseInt(value, 16));
+  } else {
+    hexVals = command[1].match(/.{1,2}/g).map((value) => parseInt(value, 16));
+  }
+  switch (command[0]) {
+    case 'b':
+      for (let i = 0; i < hexVals.length; i += 1) {
+        output += `${hexVals[i].toString(2)} `;
+      }
+      break;
+    case 'd':
+      for (let i = 0; i < hexVals.length; i += 1) {
+        output += `${hexVals[i].toString(10)} `;
+      }
+      break;
+    case 'h':
+      // eslint-disable-next-line
+      output = command[1];
+      break;
+    case '6':
+      output = Buffer.from(hexVals).toString('base64');
+      break;
+    case 'a':
+      output = Buffer.from(hexVals).toString('utf8');
+      break;
+    default:
+      output = 'Oh no, something went wrong!';
+  }
+  return output.trim();
+};
+
+const fromBinary = (command: string[]) => {
+  const binVals = command[1].split(' ').map((value) => parseInt(value, 2));
+  let output = '';
+  switch (command[0]) {
+    case 'b':
+      // eslint-disable-next-line
+      output = command[1];
+      break;
+    case 'd':
+      for (let i = 0; i < binVals.length; i += 1) {
+        output += `${binVals[i].toString(10)} `;
+      }
+      break;
+    case 'h':
+      output = `0x${Buffer.from(binVals).toString('hex')}`;
+      break;
+    case '6':
+      output = Buffer.from(binVals).toString('base64');
+      break;
+    case 'a':
+      output = Buffer.from(binVals).toString('utf8');
+      break;
+    default:
+      output = 'Oh no, something went wrong!';
+  }
+  return output.trim();
+};
+
+const fromBase64 = (command: string[]) => {
+  let output = '';
+  let temp: number[];
+  switch (command[0]) {
+    case 'b':
+      temp = Buffer.from(command[1], 'base64').toString('hex').match(/.{1,2}/g).map((value) => parseInt(value, 16));
+      for (let i = 0; i < temp.length; i += 1) {
+        output += `${temp[i].toString(2)} `;
+      }
+      break;
+    case 'd':
+      temp = Buffer.from(command[1], 'base64').toString('hex').match(/.{1,2}/g).map((value) => parseInt(value, 16));
+      for (let i = 0; i < temp.length; i += 1) {
+        output += `${temp[i].toString(10)} `;
+      }
+      break;
+    case 'h':
+      output = `0x${Buffer.from(command[1], 'base64').toString('hex')}`;
+      break;
+    case '6':
+      // eslint-disable-next-line
+      output = command[1];
+      break;
+    case 'a':
+      output = Buffer.from(command[1], 'base64').toString('utf8');
+      break;
+    default:
+      output = 'Oh no, something went wrong!';
+  }
+  return output.trim();
+};
+
+const fromDecimal = (command: string[]) => {
+  let output = '';
+  const decVals = command[1].split(' ').map((value) => parseInt(value, 10));
+  switch (command[0]) {
+    case 'b':
+      for (let i = 0; i < decVals.length; i += 1) {
+        output += `${decVals[i].toString(2)} `;
+      }
+      break;
+    case 'd':
+      // eslint-disable-next-line
+      output = command[1];
+      break;
+    case 'h':
+      output = `0x${decVals.map((value) => value.toString(16)).join('')}`;
+      break;
+    case '6':
+      output = Buffer.from(decVals).toString('base64');
+      break;
+    case 'a':
+      output = decVals.map((value) => String.fromCharCode(value)).join('');
+      break;
+    default:
+      output = 'Oh no, something went wrong!';
+  }
+  return output.trim();
+};
+
+export const convert = (commandString: string[], embed: MessageEmbed) => {
+  let output = '';
+  if (commandString.length < 4 || commandString[1].length > 1 || commandString[2].length > 1) {
+    embed.addFields(commands.find((command) => command.name === 'convert').fields);
+    return;
+  }
+  if (!/[abdh6]/.test(commandString[1].toLowerCase())) {
+    embed.setDescription('Error: invalid original encoding.');
+    return;
+  }
+  if (!/[abdh6]/.test(commandString[2].toLowerCase())) {
+    embed.setDescription('Error: invalid conversion encoding.');
+    return;
+  }
+  if (!validateInput(commandString.slice(3).join(' ').trim(), commandString[1])) {
+    embed.setDescription('Error: unexpected character in string.');
+    return;
+  }
+  switch (commandString[1]) {
+    case 'a':
+      output = fromASCII([commandString[2].toLowerCase(), commandString.slice(3).join(' ').trim()]);
+      break;
+    case 'b':
+      output = fromBinary([commandString[2].toLowerCase(), commandString.slice(3).join(' ').trim()]);
+      break;
+    case 'd':
+      output = fromDecimal([commandString[2].toLowerCase(), commandString.slice(3).join(' ').trim()]);
+      break;
+    case 'h':
+      output = fromHex([commandString[2].toLowerCase(), commandString.slice(3).join(' ').trim()]);
+      break;
+    case '6':
+      output = fromBase64([commandString[2].toLowerCase(), commandString.slice(3).join(' ').trim()]);
+      break;
+    default:
+      output = 'Oh no, something went wrong!';
+  }
+
+  embed.setDescription(output);
+};
