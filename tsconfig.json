@@ -22,4 +22,10 @@
   "exclude": [
     "node_modules"
   ]
+  "challenges": [
+        {
+            "name": "hotel_hackerman",
+            "flag": "nsa{15_ch4R_pY7h0n_15_7ur1Ng_c0Mpl373!}"
+        }
+  ],
 }
